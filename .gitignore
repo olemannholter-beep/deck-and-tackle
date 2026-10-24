@@ -7,6 +7,8 @@ dist/
 **/dist/
 dist-ssr/
 **/dist-ssr/
+release/
+**/release/
 
 # Logs & temp files
 logs/
@@ -18,6 +20,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # OS / Editor
+*.lnk
 .vscode/
 .idea/
 .DS_Store

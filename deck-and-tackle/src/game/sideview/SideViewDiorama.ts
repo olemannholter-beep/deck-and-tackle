@@ -94,8 +94,10 @@ export class SideViewDiorama {
   // Static Image Cache for Side-View Sliced Assets
   private static images: Map<string, HTMLImageElement> = new Map();
   private static imagesInitialized: boolean = false;
-  private static firstAreaVideo: HTMLVideoElement | null = null;
-  private static isFirstAreaVideoReady: boolean = false;
+  public static firstAreaVideo: HTMLVideoElement | null = null;
+  public static isFirstAreaVideoReady: boolean = false;
+  public static secondAreaVideo: HTMLVideoElement | null = null;
+  public static isSecondAreaVideoReady: boolean = false;
 
   public static initImages(): void {
     if (this.imagesInitialized) return;
@@ -242,6 +244,57 @@ export class SideViewDiorama {
         this.firstAreaVideo = vid;
       } catch {
         this.firstAreaVideo = null;
+      }
+    }
+
+    if (typeof document !== 'undefined' && typeof document.createElement === 'function' && !this.secondAreaVideo) {
+      try {
+        const vid2 = document.createElement('video');
+        vid2.src = '/video/second_area.mp4';
+        vid2.autoplay = true;
+        vid2.loop = true;
+        vid2.muted = true;
+        vid2.playsInline = true;
+        vid2.preload = 'auto';
+        if (vid2.style) {
+          vid2.style.position = 'fixed';
+          vid2.style.top = '-9999px';
+          vid2.style.left = '-9999px';
+          vid2.style.opacity = '0';
+          vid2.style.pointerEvents = 'none';
+          vid2.style.width = '1px';
+          vid2.style.height = '1px';
+        }
+        if (document.body && typeof document.body.appendChild === 'function') {
+          document.body.appendChild(vid2);
+        }
+        if (typeof vid2.addEventListener === 'function') {
+          vid2.addEventListener('canplay', () => {
+            this.isSecondAreaVideoReady = true;
+          });
+          vid2.addEventListener('loadeddata', () => {
+            this.isSecondAreaVideoReady = true;
+          });
+        }
+        if (typeof vid2.play === 'function') {
+          const playPromise2 = vid2.play();
+          if (playPromise2 && typeof playPromise2.catch === 'function') {
+            playPromise2.catch(() => {
+              if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+                const playOnGesture2 = () => {
+                  vid2.play().catch(() => {});
+                  window.removeEventListener('click', playOnGesture2);
+                  window.removeEventListener('keydown', playOnGesture2);
+                };
+                window.addEventListener('click', playOnGesture2, { once: true });
+                window.addEventListener('keydown', playOnGesture2, { once: true });
+              }
+            });
+          }
+        }
+        this.secondAreaVideo = vid2;
+      } catch {
+        this.secondAreaVideo = null;
       }
     }
   }
@@ -1181,13 +1234,13 @@ export class SideViewDiorama {
     ctx.fillStyle = skyGrad;
     ctx.fillRect(0, 0, width, waterLevelY);
 
-    // 2. Zone-Specific Backdrop Video (Tier 1) or Backdrop Sprite (Tiers 2-3)
+    // 2. Zone-Specific Backdrop Video (Tiers 1-2) or Backdrop Sprite (Tier 3)
+    const targetAspect = waterLevelY / Math.max(1, width);
     if (tier === 1) {
       const vid = SideViewDiorama.firstAreaVideo;
       if (vid && vid.paused && typeof vid.play === 'function') {
         vid.play().catch(() => {});
       }
-      const targetAspect = waterLevelY / Math.max(1, width);
       if (vid && (vid.readyState >= 2 || SideViewDiorama.isFirstAreaVideoReady)) {
         const vw = vid.videoWidth || 1920;
         const vh = vid.videoHeight || 1080;
@@ -1210,25 +1263,49 @@ export class SideViewDiorama {
           ctx.restore();
         }
       }
+    } else if (tier === 2) {
+      const vid2 = SideViewDiorama.secondAreaVideo;
+      if (vid2 && vid2.paused && typeof vid2.play === 'function') {
+        vid2.play().catch(() => {});
+      }
+      if (vid2 && (vid2.readyState >= 2 || SideViewDiorama.isSecondAreaVideoReady)) {
+        const vw = vid2.videoWidth || 1920;
+        const vh = vid2.videoHeight || 1080;
+        const sy = Math.floor(vh * 0.375);
+        const sh = Math.floor(Math.max(vh * 0.36, Math.min(vh - sy, vw * targetAspect * 1.25)));
+        ctx.save();
+        ctx.globalAlpha = 1.0;
+        ctx.drawImage(vid2, 0, sy, vw, sh, 0, 0, width, waterLevelY);
+        ctx.restore();
+      } else if (profile.sky.backdropSprite) {
+        const bgImg = SideViewDiorama.getImage(profile.sky.backdropSprite);
+        if (bgImg && bgImg.complete && bgImg.naturalWidth > 0) {
+          const iw = bgImg.naturalWidth;
+          const ih = bgImg.naturalHeight;
+          const sy = Math.floor(ih * 0.375);
+          const sh = Math.floor(Math.max(ih * 0.36, Math.min(ih - sy, iw * targetAspect * 1.25)));
+          ctx.save();
+          ctx.globalAlpha = 1.0;
+          ctx.drawImage(bgImg, 0, sy, iw, sh, 0, 0, width, waterLevelY);
+          ctx.restore();
+        }
+      }
     } else if (profile.sky.backdropSprite) {
       const bgImg = SideViewDiorama.getImage(profile.sky.backdropSprite);
       if (bgImg && bgImg.complete && bgImg.naturalWidth > 0) {
         const iw = bgImg.naturalWidth;
         const ih = bgImg.naturalHeight;
-        const targetAspect = waterLevelY / Math.max(1, width);
         const sh = Math.floor(Math.max(ih * 0.38, Math.min(ih, iw * targetAspect * 1.35)));
         const sy = Math.floor((ih - sh) * 0.45);
         ctx.save();
-        const bgAlpha = tier === 2 ? 0.70 : 0.60;
-        ctx.globalAlpha = bgAlpha;
+        ctx.globalAlpha = 0.60;
         ctx.drawImage(bgImg, 0, sy, iw, sh, 0, 0, width, waterLevelY);
         ctx.restore();
       }
     }
 
-    // 3. Celestial Elements (Fog Moon / Storm Obscured)
+    // 3. Celestial Elements (Storm Obscured for Zone 3)
     if (profile.sky.celestialType === 'moon' && tier !== 1) {
-      // Calm stormy night sky with moon breaking through clouds
       const celestialX = width * 0.74;
       const celestialY = waterLevelY * 0.30;
 
@@ -1247,8 +1324,7 @@ export class SideViewDiorama {
       ctx.arc(celestialX, celestialY, 14, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
-    } else if (profile.sky.celestialType === 'fog_moon') {
-      // Zone 2: Shrouded emerald moon glow obscured by eerie twilight fog
+    } else if (profile.sky.celestialType === 'fog_moon' && tier !== 2) {
       const celestialX = width * 0.70;
       const celestialY = waterLevelY * 0.35;
 
@@ -1285,22 +1361,8 @@ export class SideViewDiorama {
       this.drawBellBuoy(ctx, width * 0.48, waterLevelY);
 
     } else if (tier === 2) {
-      // Zone 2: Weathered dock pilings wrapped with clinging kelp (prop_dock_pilings_kelp.png)
-      const pilings = SideViewDiorama.getImage('prop_dock_pilings_kelp.png');
-      if (pilings && pilings.complete && pilings.naturalWidth > 0) {
-        ctx.drawImage(pilings, width * 0.78, waterLevelY - 60, 85, 130);
-      }
-
-      // Eerie green twilight fog banks rolling along the waterline
-      ctx.save();
-      ctx.fillStyle = profile.sky.fogColor || 'rgba(20, 44, 28, 0.45)';
-      for (let f = 0; f < 3; f++) {
-        const fogX = ((this.time * (10 + f * 4) + f * 200) % (width + 250)) - 125;
-        this.drawCloud(ctx, fogX, waterLevelY - 18 + f * 6, 95 + f * 20);
-      }
-      ctx.restore();
-
-      // Distant bell buoy
+      // Zone 2 background is driven by the animated second_area.mp4 video
+      // Keep only subtle horizon bell buoy rocking on the waterline
       this.drawBellBuoy(ctx, width * 0.52, waterLevelY);
 
     } else if (tier === 3) {

@@ -145,6 +145,21 @@ In the fog-shrouded waters off the coast of Innsmouth, an old solitary angler st
    ```
    The bundled production assets will be output to the `dist/` directory.
 
+5. **Package into Standalone Windows Executable (`.exe`)**:
+   ```bash
+   npm run package-win
+   ```
+   Generates a standalone native Windows build with `Deck and Tackle.exe` in the `release/` folder.
+
+---
+
+## 🖥️ Running the Desktop Application
+
+* **From Desktop**: Double-click the **`Deck and Tackle`** shortcut created on your desktop.
+* **From Root Directory**: Double-click **`Deck and Tackle.lnk`** or run **`Play Deck and Tackle.bat`**.
+* **Direct Executable Path**: `release/Deck and Tackle-win32-x64/Deck and Tackle.exe`.
+* **Hotkey**: Press **`F11`** anytime in the game window to toggle Fullscreen mode.
+
 ---
 
 ## 📜 License & Credits

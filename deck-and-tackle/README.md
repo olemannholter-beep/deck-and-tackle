@@ -17,6 +17,9 @@ npm run dev
 
 # Build for production
 npm run build
+
+# Package standalone Windows executable (.exe)
+npm run package-win
 ```
 
 See the root [README.md](../README.md) for full game features, controls, and architecture documentation.
