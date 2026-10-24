@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Deck & Tackle — Horror Sound Effects & Soundtrack Audition Board</title>
+  <style>
+    :root {
+      --bg: #070b0e;
+      --card-bg: #0f161d;
+      --card-hover: #151e27;
+      --border: #1a2632;
+      --text: #e2e8f0;
+      --text-muted: #8494a5;
+      --accent: #14b8a6;
+      --accent-glow: rgba(20, 184, 166, 0.25);
+      --crimson: #e11d48;
+      --crimson-glow: rgba(225, 29, 72, 0.35);
+      --amber: #f59e0b;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      padding: 30px 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .wrapper {
+      width: 100%;
+      max-width: 980px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+    header {
+      background: linear-gradient(180deg, #131c24 0%, #0a0f14 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 4px 28px rgba(0,0,0,0.8);
+      position: relative;
+    }
+    h1 {
+      font-size: 24px;
+      color: #f43f5e;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      text-shadow: 0 0 12px rgba(244, 63, 94, 0.4);
+    }
+    p.sub {
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .badge-bar {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(225, 29, 72, 0.15);
+      border: 1px solid rgba(225, 29, 72, 0.4);
+      color: #fda4af;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .badge.green {
+      background: rgba(20, 184, 166, 0.15);
+      border-color: rgba(20, 184, 166, 0.4);
+      color: #5eead4;
+    }
+
+    /* Soundscape Master Bar */
+    .master-bar {
+      background: #0f1720;
+      border: 1px solid #1c2b38;
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.5);
+    }
+    .bg-control {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-bg {
+      background: #0284c7;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-weight: 600;
+      font-size: 13.5px;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .btn-bg:hover { background: #0369a1; }
+    .btn-bg.playing {
+      background: #e11d48;
+      box-shadow: 0 0 16px rgba(225, 29, 72, 0.5);
+    }
+
+    .category-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .category-title span {
+      height: 1px;
+      flex: 1;
+      background: var(--border);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 14px;
+    }
+    .sfx-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 15px 17px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.15s ease;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+    }
+    .sfx-card:hover {
+      background: var(--card-hover);
+      border-color: #2b3d4f;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+    }
+    .sfx-card.highlight {
+      border-color: #0d9488;
+      background: #0e1a22;
+    }
+    .sfx-card:active {
+      transform: translateY(0);
+      border-color: var(--crimson);
+    }
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sfx-name {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sfx-tag {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.06);
+      color: var(--text-muted);
+    }
+    .sfx-tag.fav {
+      background: rgba(20, 184, 166, 0.2);
+      color: #2dd4bf;
+      border: 1px solid rgba(20, 184, 166, 0.4);
+    }
+    .sfx-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+    .card-btn {
+      margin-top: 4px;
+      background: #141f29;
+      border: 1px solid #203140;
+      color: #f43f5e;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .sfx-card:hover .card-btn {
+      background: rgba(225, 29, 72, 0.15);
+      border-color: var(--crimson);
+      color: #fff;
+    }
+    .sfx-card.highlight:hover .card-btn {
+      background: rgba(20, 184, 166, 0.2);
+      border-color: #14b8a6;
+      color: #fff;
+    }
+
+    /* Pulse animation on play */
+    .sfx-card.active-play {
+      border-color: var(--crimson) !important;
+      box-shadow: 0 0 20px var(--crimson-glow) !important;
+      background: #1c1017 !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <header>
+      <h1>Deck & Tackle — Horror Sound Effects Suite</h1>
+      <p class="sub">Refined with visceral Lovecraftian dread, cold dark brine, straining iron, and psychological horror.</p>
+      <div class="badge-bar">
+        <span class="badge">Lovecraftian Horror Refinement</span>
+        <span class="badge green">⭐ Foghorn Kept Intact</span>
+        <span class="badge">Zero Code Modified</span>
+      </div>
+    </header>
+
+    <!-- Background Music Tester -->
+    <div class="master-bar">
+      <div class="bg-control">
+        <button id="toggleBgBtn" class="btn-bg" onclick="toggleBackgroundMusic()">▶ Play Overworld Slow Suite in Background</button>
+        <span style="font-size: 13px; color: var(--text-muted);">Audition horror SFX layered over the soundtrack</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted);">
+        <span>Music Vol:</span>
+        <input type="range" id="bgVolume" min="0" max="1" step="0.05" value="0.45" oninput="setBgVolume(this.value)" style="cursor: pointer;">
+      </div>
+    </div>
+    <audio id="bgAudio" loop src="../music/Overworld_Slow_Suite.mp3" preload="none"></audio>
+
+    <!-- SECTION 1: MARITIME & OVERWORLD -->
+    <div>
+      <div class="category-title">⛵ Overworld & Maritime Navigation <span></span></div>
+      <div class="grid">
+        <div class="sfx-card highlight" onclick="playSfx('sfx_foghorn', this)">
+          <div class="card-top">
+            <div class="sfx-name">📯 Abyssal Foghorn</div>
+            <div class="sfx-tag fav">★ Kept Original</div>
+          </div>
+          <p class="sfx-desc">Your approved, iconic low-brass fifth (C2 + G2) echoing through maritime fog banks. Left 100% untouched.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+
+        <div class="sfx-card" onclick="playSfx('sfx_bell_buoy', this)">
+          <div class="card-top">
+            <div class="sfx-name">🔔 Haunted Bell Buoy</div>
+            <div class="sfx-tag">Spectral Drone</div>
+          </div>
+          <p class="sfx-desc">Discordant C5 toll with an eerie F# tritone and minor second beating. Weeps like a spectral funeral bell in empty mist.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+
+        <div class="sfx-card" onclick="playSfx('sfx_water_lap', this)">
+          <div class="card-top">
+            <div class="sfx-name">🌊 Viscous Abyssal Wake</div>
+            <div class="sfx-tag">Murky Sea</div>
+          </div>
+          <p class="sfx-desc">Cold, heavy black water sloshing with subterranean gurgles and barnacle clicks parting against wet rotting oak.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+
+        <div class="sfx-card" onclick="playSfx('sfx_boat_engine_loop', this)">
+          <div class="card-top">
+            <div class="sfx-name">🚤 Muffled Engine Purr</div>
+            <div class="sfx-tag">Quiet Loop</div>
+          </div>
+          <p class="sfx-desc">Subdued vintage single-cylinder pulse, low-pass filtered at 340Hz. Muffled hull vibration that stays quietly in the background.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+
+        <div class="sfx-card" onclick="playSfx('sfx_dock_bump', this)">
+          <div class="card-top">
+            <div class="sfx-name">⚓ Dock Crushing Impact</div>
+            <div class="sfx-tag">Groaning Timber</div>
+          </div>
+          <p class="sfx-desc">Heavy sub-38Hz crushing thud into slimy pilings, followed by an agonizing wood friction creak under stress.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: FISHING & BOBBER MINIGAME -->
+    <div>
+      <div class="category-title">🎣 Rod Casting & Bobber Minigame <span></span></div>
+      <div class="grid">
+        <div class="sfx-card" onclick="playSfx('sfx_cast_whoosh', this)">
+          <div class="card-top">
+            <div class="sfx-name">⚡ Heavy Rod Whip</div>
+            <div class="sfx-tag">Heavy Cut</div>
+          </div>
+          <p class="sfx-desc">Low-frequency centrifugal rod flex (82Hz) and dark air displacement. No high whistling chirps.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+
+        <div class="sfx-card" onclick="playSfx('sfx_bobber_splash', this)">
+          <div class="card-top">
+            <div class="sfx-name">💧 Abyssal Water Plunge</div>
+            <div class="sfx-tag">Muffled Slap</div>
+          </div>
+          <p class="sfx-desc">Heavy, dull lead weight and cork plunge with deep 42Hz cavity displacement and cold water suction. Zero cute bubble sounds.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+
+        <div class="sfx-card" onclick="playSfx('sfx_nibble_twitch', this)">
+          <div class="card-top">
+            <div class="sfx-name">👁️ Submerged Line Shudder</div>
+            <div class="sfx-tag">Uncanny Tension</div>
+          </div>
+          <p class="sfx-desc">Tense, low 140Hz wire vibration with flutter and muffled 68Hz underwater pressure displacement hinting an unseen presence.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+
+        <div class="sfx-card" onclick="playSfx('sfx_bite_splash', this)">
+          <div class="card-top">
+            <div class="sfx-name">🩸 Visceral Guttural Breach</div>
+            <div class="sfx-tag">Deep Rupture</div>
+          </div>
+          <p class="sfx-desc">Terrifying 34Hz infrasound rupture, heavy dark water churn, and low guttural predatory jaw snap initiating combat.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: CARD COMBAT & LINE PHYSICS -->
+    <div>
+      <div class="category-title">🃏 Deck Battle & Line Physics <span></span></div>
+      <div class="grid">
+        <div class="sfx-card" onclick="playSfx('sfx_card_draw', this)">
+          <div class="card-top">
+            <div class="sfx-name">📜 Ancient Grimoire Vellum</div>
+            <div class="sfx-tag">Occult Draw</div>
+          </div>
+          <p class="sfx-desc">Dry, brittle human-skin vellum sliding off the deck with a ghostly whisper/sigh and sinister card flick.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+
+        <div class="sfx-card" onclick="playSfx('sfx_card_play', this)">
+          <div class="card-top">
+            <div class="sfx-name">🕯️ Sacrificial Table Slam</div>
+            <div class="sfx-tag">Tritone Invocation</div>
+          </div>
+          <p class="sfx-desc">Heavy mahogany table impact thud paired with an eerie tritone drone (C3 + F#3 + Eb3) invoking eldritch rites.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+
+        <div class="sfx-card" onclick="playSfx('sfx_reel_ratchet', this)">
+          <div class="card-top">
+            <div class="sfx-name">⚙️ Strained Iron Winch</div>
+            <div class="sfx-tag">Heavy Tension</div>
+          </div>
+          <p class="sfx-desc">Rusted iron gear teeth struggling under immense abyssal drag, groaning chassis ring (740Hz tritone resonance).</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+
+        <div class="sfx-card" onclick="playSfx('sfx_drag_release', this)">
+          <div class="card-top">
+            <div class="sfx-name">💨 Screeching Drag Slip</div>
+            <div class="sfx-tag">Overheating Clutch</div>
+          </div>
+          <p class="sfx-desc">Frantic friction clutch screech, line screaming off the spool, and boat shuddering under the pull of a leviathan.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+
+        <div class="sfx-card" onclick="playSfx('sfx_tension_strike', this)">
+          <div class="card-top">
+            <div class="sfx-name">⚔️ Bone-Snapping Strike</div>
+            <div class="sfx-tag">Brutal Impact</div>
+          </div>
+          <p class="sfx-desc">Whip crack transient, heavy sub-bass impact thud (52Hz), and a razor-wire metallic twang slicing the water.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+
+        <div class="sfx-card" onclick="playSfx('sfx_fish_thrash', this)">
+          <div class="card-top">
+            <div class="sfx-name">🦈 Eldritch Tail Thrash</div>
+            <div class="sfx-tag">Violent Spatter</div>
+          </div>
+          <p class="sfx-desc">3 successive heavy wet muscular tail wallops against the hull, accompanied by frothing foam and low guttural growl.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+
+        <div class="sfx-card" onclick="playSfx('sfx_fish_deep_dive', this)">
+          <div class="card-top">
+            <div class="sfx-name">🌌 Cyclopean Trench Plunge</div>
+            <div class="sfx-tag">Infrasound Void</div>
+          </div>
+          <p class="sfx-desc">Terrifying infrasonic pressure drop (78Hz down to 22Hz) and cavernous underwater undertow as the beast retreats.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+
+        <div class="sfx-card" onclick="playSfx('sfx_line_warning', this)">
+          <div class="card-top">
+            <div class="sfx-name">⚠️ Microtonal Wire Scream</div>
+            <div class="sfx-tag">Panic Flutter</div>
+          </div>
+          <p class="sfx-desc">Horrifying minor-second beating (C6 vs C#6) with rapid 22Hz distress tremolo. Sounds like the line is screaming in agony.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+
+        <div class="sfx-card" onclick="playSfx('sfx_line_snap', this)">
+          <div class="card-top">
+            <div class="sfx-name">💔 Gunshot Line Snap</div>
+            <div class="sfx-tag">Catastrophic Break</div>
+          </div>
+          <p class="sfx-desc">Violent gunshot whip crack that jolts the ear, sudden monofilament recoil twang dying into hollow, dead silence.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: REWARDS & UI -->
+    <div>
+      <div class="category-title">🪙 Rewards, Keepnet & Harbor UI <span></span></div>
+      <div class="grid">
+        <div class="sfx-card" onclick="playSfx('sfx_catch_victory', this)">
+          <div class="card-top">
+            <div class="sfx-name">🏆 Mournful Church Toll</div>
+            <div class="sfx-tag">Dark Resolution</div>
+          </div>
+          <p class="sfx-desc">Solitary deep C3 funeral bell toll with cold decaying partials, followed by the heavy wet squelch of an abomination in the creel. No happy fanfare.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+
+        <div class="sfx-card" onclick="playSfx('sfx_gold_coins', this)">
+          <div class="card-top">
+            <div class="sfx-name">💰 Leaden Innsmouth Bullion</div>
+            <div class="sfx-tag">Muffled Relics</div>
+          </div>
+          <p class="sfx-desc">Dull, heavy, tarnished lead and ancient bullion clunking onto damp wood. Zero high-pitch casino pings.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+
+        <div class="sfx-card" onclick="playSfx('sfx_button_click', this)">
+          <div class="card-top">
+            <div class="sfx-name">🔘 Rusted Iron Telegraph Snap</div>
+            <div class="sfx-tag">Tactile Lever</div>
+          </div>
+          <p class="sfx-desc">Heavy rusted iron latch click with hollow internal resonance, like an antique marine switchboard.</p>
+          <div class="card-btn">▶ Play Effect</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function playSfx(name, cardEl) {
+      const audio = new Audio(`./${name}.mp3`);
+      audio.volume = 0.60;
+      audio.play().catch(e => console.log('Audio playback allowed after user interaction'));
+
+      cardEl.classList.add('active-play');
+      setTimeout(() => {
+        cardEl.classList.remove('active-play');
+      }, 350);
+    }
+
+    function toggleBackgroundMusic() {
+      const bg = document.getElementById('bgAudio');
+      const btn = document.getElementById('toggleBgBtn');
+      if (bg.paused) {
+        bg.play().then(() => {
+          btn.textContent = '⏸ Pause Overworld Soundtrack';
+          btn.classList.add('playing');
+        }).catch(err => {
+          alert('Click anywhere on the page first to allow audio playback.');
+        });
+      } else {
+        bg.pause();
+        btn.textContent = '▶ Play Overworld Slow Suite in Background';
+        btn.classList.remove('playing');
+      }
+    }
+
+    function setBgVolume(val) {
+      document.getElementById('bgAudio').volume = parseFloat(val);
+    }
+  </script>
+</body>
+</html>
