@@ -153,12 +153,20 @@ In the fog-shrouded waters off the coast of Innsmouth, an old solitary angler st
 
 ---
 
-## 🖥️ Running the Desktop Application
+## 🖥️ Running the Game
 
+### Windows Standalone Desktop App
 * **From Desktop**: Double-click the **`Deck and Tackle`** shortcut created on your desktop.
 * **From Root Directory**: Double-click **`Deck and Tackle.lnk`** or run **`Play Deck and Tackle.bat`**.
 * **Direct Executable Path**: `release/Deck and Tackle-win32-x64/Deck and Tackle.exe`.
 * **Hotkey**: Press **`F11`** anytime in the game window to toggle Fullscreen mode.
+
+### 🍎 macOS Version (`MAC/` Folder)
+A dedicated, self-contained macOS build is provided in the **[`MAC/`](file:///c:/Users/olema/Desktop/testing%20topdown/MAC)** directory.
+* **1-Click Launch**: In macOS Finder, simply double-click **`MAC/Play_Mac.command`**.
+  * It starts a lightweight local server via macOS's built-in Python and opens the game directly in Safari, Chrome, or your default browser with full audio and animated video backgrounds.
+* **Terminal Launch**: Run `./MAC/Play_Mac.sh` or `cd MAC && python3 -m http.server 8080`.
+* **Web Hosting**: Drop the `MAC/` folder onto any static web server or host (GitHub Pages, Netlify, Vercel) and load `index.html`.
 
 ---
 
