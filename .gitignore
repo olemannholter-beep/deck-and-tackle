@@ -36,3 +36,6 @@ Thumbs.db
 scratch/
 **/scratch/
 *.tmp
+
+godot-port/.godot/
+godot-port/Godot_*.exe

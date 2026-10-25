@@ -42,7 +42,8 @@ func _ready() -> void:
 	lantern_light.color = Color(1.0, 0.85, 0.52, 1.0)
 	lantern_light.energy = 1.35
 	lantern_light.shadow_enabled = true
-	lantern_light.shadow_Soft_size = 4.0
+	lantern_light.shadow_filter = PointLight2D.SHADOW_FILTER_PCF5
+	lantern_light.shadow_filter_smooth = 4.0
 	lantern_light.texture = _create_radial_light_texture(256)
 	lantern_light.texture_scale = 2.4
 	add_child(lantern_light)
