@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Deck & Tackle — Zone Visual Sprites & Assets Gallery</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #060a12; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 28px; }
+    h1 { font-size: 30px; color: #38bdf8; margin-bottom: 8px; font-weight: 800; letter-spacing: 0.5px; }
+    .subtitle { color: #94a3b8; font-size: 14px; margin-bottom: 24px; }
+    .instructions { background: #0f172a; border-left: 4px solid #38bdf8; padding: 16px 20px; border-radius: 8px; margin-bottom: 32px; font-size: 13px; line-height: 1.6; }
+    .instructions code { background: #1e293b; color: #38bdf8; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+    .zone-block { margin-bottom: 44px; background: #0a101d; border: 1px solid #1e293b; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+    .zone-title { font-size: 20px; font-weight: 700; color: #5eead4; border-bottom: 1px solid #1e293b; padding-bottom: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+    .subcat-title { font-size: 14px; font-weight: 600; color: #cbd5e1; margin: 20px 0 12px 0; text-transform: uppercase; letter-spacing: 0.8px; border-left: 3px solid #38bdf8; padding-left: 10px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .card { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.15s, border-color 0.15s; }
+    .card:hover { transform: translateY(-3px); border-color: #38bdf8; box-shadow: 0 8px 20px rgba(0,0,0,0.6); }
+    .thumb-container { background: #020610; height: 145px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; padding: 8px; }
+    .thumb-container img { max-width: 100%; max-height: 100%; object-fit: contain; image-rendering: pixelated; }
+    .thumb-container video { max-width: 100%; max-height: 100%; object-fit: cover; }
+    .card-info { padding: 10px 12px; font-size: 12px; background: #0f172a; border-top: 1px solid #1e293b; }
+    .filename { font-weight: 600; color: #f1f5f9; word-break: break-all; margin-bottom: 6px; font-size: 12px; }
+    .meta { color: #64748b; font-size: 11px; display: flex; justify-content: space-between; }
+    .badge { padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 10px; }
+    .badge-png { background: #1e293b; color: #38bdf8; }
+    .badge-vid { background: #3b0764; color: #d8b4fe; }
+  </style>
+</head>
+<body>
+  <h1>⚓ Deck & Tackle — Zone Visual Sprites & Assets Catalog</h1>
+  <p class="subtitle">Categorized visual breakdown of all 156 sprites, animated textures, videos, and UI elements.</p>
+  
+  <div class="instructions">
+    <strong style="color: #f1f5f9; font-size: 14px;">🛠️ How to review and change sprites for each zone:</strong><br>
+    1. Browse the gallery below to inspect every sprite, its category, and exact filename.<br>
+    2. To replace any sprite in the game, save your new transparent PNG or MP4 using the <strong>exact same filename</strong> into <code>deck-and-tackle/public/assets/sprites/fishing/</code> (or <code>shop/</code>).<br>
+    3. The game will automatically load your new sprite on the next reload!
+  </div>
+  <div class="zone-block">
+    <div class="zone-title"><span>📂 Shared_Vessel_Angler_and_Tackle</span></div>
+    <div class="subcat-title">📁 01 Boat and Fisherman (9 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/01_Boat_and_Fisherman/boat_trawler_derelict.png" alt="boat_trawler_derelict.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">boat_trawler_derelict.png</div>
+          <div class="meta"><span>58 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/01_Boat_and_Fisherman/boat_trawler_lit.png" alt="boat_trawler_lit.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">boat_trawler_lit.png</div>
+          <div class="meta"><span>67 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/01_Boat_and_Fisherman/fisherman_casting_rod.png" alt="fisherman_casting_rod.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fisherman_casting_rod.png</div>
+          <div class="meta"><span>32 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/01_Boat_and_Fisherman/fisherman_holding_lantern.png" alt="fisherman_holding_lantern.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fisherman_holding_lantern.png</div>
+          <div class="meta"><span>29 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/01_Boat_and_Fisherman/fisherman_reeling_pull.png" alt="fisherman_reeling_pull.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fisherman_reeling_pull.png</div>
+          <div class="meta"><span>31 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/01_Boat_and_Fisherman/fisherman_sitting_crate.png" alt="fisherman_sitting_crate.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fisherman_sitting_crate.png</div>
+          <div class="meta"><span>25 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/01_Boat_and_Fisherman/rowboat_fisherman_cast.png" alt="rowboat_fisherman_cast.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">rowboat_fisherman_cast.png</div>
+          <div class="meta"><span>29 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/01_Boat_and_Fisherman/rowboat_fisherman_lantern.png" alt="rowboat_fisherman_lantern.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">rowboat_fisherman_lantern.png</div>
+          <div class="meta"><span>29 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/01_Boat_and_Fisherman/rowboat_fisherman_reel.png" alt="rowboat_fisherman_reel.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">rowboat_fisherman_reel.png</div>
+          <div class="meta"><span>31 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="subcat-title">📁 02 Tackle and Rods (8 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/02_Tackle_and_Rods/tackle_bobber.png" alt="tackle_bobber.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">tackle_bobber.png</div>
+          <div class="meta"><span>10 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/02_Tackle_and_Rods/tackle_hook_bone.png" alt="tackle_hook_bone.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">tackle_hook_bone.png</div>
+          <div class="meta"><span>5 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/02_Tackle_and_Rods/tackle_hook_iron.png" alt="tackle_hook_iron.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">tackle_hook_iron.png</div>
+          <div class="meta"><span>4 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/02_Tackle_and_Rods/tackle_lure_shrimp.png" alt="tackle_lure_shrimp.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">tackle_lure_shrimp.png</div>
+          <div class="meta"><span>6 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/02_Tackle_and_Rods/tackle_lure_snail.png" alt="tackle_lure_snail.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">tackle_lure_snail.png</div>
+          <div class="meta"><span>4 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/02_Tackle_and_Rods/tackle_rod_diagonal_long.png" alt="tackle_rod_diagonal_long.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">tackle_rod_diagonal_long.png</div>
+          <div class="meta"><span>6 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/02_Tackle_and_Rods/tackle_rod_diagonal_short.png" alt="tackle_rod_diagonal_short.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">tackle_rod_diagonal_short.png</div>
+          <div class="meta"><span>5 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/02_Tackle_and_Rods/tackle_rod_horizontal.png" alt="tackle_rod_horizontal.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">tackle_rod_horizontal.png</div>
+          <div class="meta"><span>5 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="subcat-title">📁 03 Battle UI and Gauges (6 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/03_Battle_UI_and_Gauges/parchment_item_plate.png" alt="parchment_item_plate.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">parchment_item_plate.png</div>
+          <div class="meta"><span>135 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/03_Battle_UI_and_Gauges/ui_btn_flee.png" alt="ui_btn_flee.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">ui_btn_flee.png</div>
+          <div class="meta"><span>3 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/03_Battle_UI_and_Gauges/ui_depth_gauge.png" alt="ui_depth_gauge.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">ui_depth_gauge.png</div>
+          <div class="meta"><span>29 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/03_Battle_UI_and_Gauges/ui_frame_corner_bottom_left.png" alt="ui_frame_corner_bottom_left.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">ui_frame_corner_bottom_left.png</div>
+          <div class="meta"><span>4 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/03_Battle_UI_and_Gauges/ui_power_tension_gauge.png" alt="ui_power_tension_gauge.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">ui_power_tension_gauge.png</div>
+          <div class="meta"><span>51 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shared_Vessel_Angler_and_Tackle/03_Battle_UI_and_Gauges/ui_prompt_power_throw.png" alt="ui_prompt_power_throw.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">ui_prompt_power_throw.png</div>
+          <div class="meta"><span>15 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="zone-block">
+    <div class="zone-title"><span>📂 Shop_and_Harbor_Chandlery</span></div>
+    <div class="subcat-title">📁 01 Shopkeeper and Diorama (5 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shop_and_Harbor_Chandlery/01_Shopkeeper_and_Diorama/fisherman_merchant.png" alt="fisherman_merchant.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fisherman_merchant.png</div>
+          <div class="meta"><span>148 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shop_and_Harbor_Chandlery/01_Shopkeeper_and_Diorama/grimoire_ledger_book.png" alt="grimoire_ledger_book.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">grimoire_ledger_book.png</div>
+          <div class="meta"><span>2505 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shop_and_Harbor_Chandlery/01_Shopkeeper_and_Diorama/shop_left_diorama_bg.png" alt="shop_left_diorama_bg.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">shop_left_diorama_bg.png</div>
+          <div class="meta"><span>3758 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shop_and_Harbor_Chandlery/01_Shopkeeper_and_Diorama/specimen_aquarium.png" alt="specimen_aquarium.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">specimen_aquarium.png</div>
+          <div class="meta"><span>1209 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shop_and_Harbor_Chandlery/01_Shopkeeper_and_Diorama/ui_header_bar.png" alt="ui_header_bar.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">ui_header_bar.png</div>
+          <div class="meta"><span>251 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="subcat-title">📁 02 Item and Upgrade Icons (8 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shop_and_Harbor_Chandlery/02_Item_and_Upgrade_Icons/icon_abyssal_chum.png" alt="icon_abyssal_chum.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">icon_abyssal_chum.png</div>
+          <div class="meta"><span>68 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shop_and_Harbor_Chandlery/02_Item_and_Upgrade_Icons/icon_black_iron_winch.png" alt="icon_black_iron_winch.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">icon_black_iron_winch.png</div>
+          <div class="meta"><span>29 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shop_and_Harbor_Chandlery/02_Item_and_Upgrade_Icons/icon_cyclopean_gantry.png" alt="icon_cyclopean_gantry.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">icon_cyclopean_gantry.png</div>
+          <div class="meta"><span>22 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shop_and_Harbor_Chandlery/02_Item_and_Upgrade_Icons/icon_dagons_barbed_hook.png" alt="icon_dagons_barbed_hook.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">icon_dagons_barbed_hook.png</div>
+          <div class="meta"><span>70 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shop_and_Harbor_Chandlery/02_Item_and_Upgrade_Icons/icon_eldritch_lure.png" alt="icon_eldritch_lure.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">icon_eldritch_lure.png</div>
+          <div class="meta"><span>19 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shop_and_Harbor_Chandlery/02_Item_and_Upgrade_Icons/icon_kelp_snare.png" alt="icon_kelp_snare.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">icon_kelp_snare.png</div>
+          <div class="meta"><span>19 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shop_and_Harbor_Chandlery/02_Item_and_Upgrade_Icons/icon_void_pump.png" alt="icon_void_pump.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">icon_void_pump.png</div>
+          <div class="meta"><span>24 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Shop_and_Harbor_Chandlery/02_Item_and_Upgrade_Icons/parchment_item_plate.png" alt="parchment_item_plate.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">parchment_item_plate.png</div>
+          <div class="meta"><span>135 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="zone-block">
+    <div class="zone-title"><span>📂 Zone 1 - The Shallows (Coastal Shoals)</span></div>
+    <div class="subcat-title">📁 01 Backgrounds and Sky (3 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/01_Backgrounds_and_Sky/bg_coastal_lighthouse.png" alt="bg_coastal_lighthouse.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">bg_coastal_lighthouse.png</div>
+          <div class="meta"><span>1779 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <video src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/01_Backgrounds_and_Sky/first_area.mp4" autoplay loop muted playsinline></video>
+        </div>
+        <div class="card-info">
+          <div class="filename">first_area.mp4</div>
+          <div class="meta"><span>7596 KB</span><span class="badge badge-vid">VIDEO</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/01_Backgrounds_and_Sky/prop_lighthouse_cliff.png" alt="prop_lighthouse_cliff.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">prop_lighthouse_cliff.png</div>
+          <div class="meta"><span>37 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="subcat-title">📁 02 Waves and Water FX (10 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/02_Waves_and_Water_FX/fx_calm_misty_swell.png" alt="fx_calm_misty_swell.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fx_calm_misty_swell.png</div>
+          <div class="meta"><span>184 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/02_Waves_and_Water_FX/fx_water_ripple.png" alt="fx_water_ripple.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fx_water_ripple.png</div>
+          <div class="meta"><span>8 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/02_Waves_and_Water_FX/fx_water_splash.png" alt="fx_water_splash.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fx_water_splash.png</div>
+          <div class="meta"><span>14 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/02_Waves_and_Water_FX/fx_wave_crest_line.png" alt="fx_wave_crest_line.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fx_wave_crest_line.png</div>
+          <div class="meta"><span>19 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/02_Waves_and_Water_FX/waves_misty_swell_1024.png" alt="waves_misty_swell_1024.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">waves_misty_swell_1024.png</div>
+          <div class="meta"><span>212 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/02_Waves_and_Water_FX/waves_misty_swell_1024_feathered.png" alt="waves_misty_swell_1024_feathered.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">waves_misty_swell_1024_feathered.png</div>
+          <div class="meta"><span>212 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/02_Waves_and_Water_FX/waves_misty_swell_strip.png" alt="waves_misty_swell_strip.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">waves_misty_swell_strip.png</div>
+          <div class="meta"><span>178 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/02_Waves_and_Water_FX/waves_moonlit_crest_1024.png" alt="waves_moonlit_crest_1024.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">waves_moonlit_crest_1024.png</div>
+          <div class="meta"><span>280 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/02_Waves_and_Water_FX/waves_moonlit_crest_1024_feathered.png" alt="waves_moonlit_crest_1024_feathered.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">waves_moonlit_crest_1024_feathered.png</div>
+          <div class="meta"><span>280 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/02_Waves_and_Water_FX/waves_moonlit_crest_strip.png" alt="waves_moonlit_crest_strip.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">waves_moonlit_crest_strip.png</div>
+          <div class="meta"><span>223 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="subcat-title">📁 03 Props and Seabed (8 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <video src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/03_Props_and_Seabed/long%20sea%20kelp%20swaying.mp4" autoplay loop muted playsinline></video>
+        </div>
+        <div class="card-info">
+          <div class="filename">long sea kelp swaying.mp4</div>
+          <div class="meta"><span>3191 KB</span><span class="badge badge-vid">VIDEO</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/03_Props_and_Seabed/pier_breakwater_beam.png" alt="pier_breakwater_beam.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">pier_breakwater_beam.png</div>
+          <div class="meta"><span>14 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/03_Props_and_Seabed/pier_piling_pair.png" alt="pier_piling_pair.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">pier_piling_pair.png</div>
+          <div class="meta"><span>13 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/03_Props_and_Seabed/pier_piling_seaweed.png" alt="pier_piling_seaweed.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">pier_piling_seaweed.png</div>
+          <div class="meta"><span>18 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/03_Props_and_Seabed/pier_piling_single.png" alt="pier_piling_single.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">pier_piling_single.png</div>
+          <div class="meta"><span>14 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/03_Props_and_Seabed/prop_animated_kelp_sheet.png" alt="prop_animated_kelp_sheet.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">prop_animated_kelp_sheet.png</div>
+          <div class="meta"><span>3619 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <video src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/03_Props_and_Seabed/sea%20kelp%20swaying.mp4" autoplay loop muted playsinline></video>
+        </div>
+        <div class="card-info">
+          <div class="filename">sea kelp swaying.mp4</div>
+          <div class="meta"><span>1767 KB</span><span class="badge badge-vid">VIDEO</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/03_Props_and_Seabed/wood_piling_stump.png" alt="wood_piling_stump.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">wood_piling_stump.png</div>
+          <div class="meta"><span>11 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="subcat-title">📁 04 Fish and Creatures (19 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/fish_animated_flatfish_sheet.png" alt="fish_animated_flatfish_sheet.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_animated_flatfish_sheet.png</div>
+          <div class="meta"><span>2993 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/fish_animated_minnow.png" alt="fish_animated_minnow.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_animated_minnow.png</div>
+          <div class="meta"><span>33 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/fish_animated_minnow_sheet.png" alt="fish_animated_minnow_sheet.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_animated_minnow_sheet.png</div>
+          <div class="meta"><span>764 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/fish_animated_school_alt_sheet.png" alt="fish_animated_school_alt_sheet.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_animated_school_alt_sheet.png</div>
+          <div class="meta"><span>9116 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/fish_animated_school_sheet.png" alt="fish_animated_school_sheet.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_animated_school_sheet.png</div>
+          <div class="meta"><span>8488 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/fish_cod_large.png" alt="fish_cod_large.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_cod_large.png</div>
+          <div class="meta"><span>29 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/fish_flounder_benthic.png" alt="fish_flounder_benthic.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_flounder_benthic.png</div>
+          <div class="meta"><span>33 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/fish_gray_cod.png" alt="fish_gray_cod.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_gray_cod.png</div>
+          <div class="meta"><span>8 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/fish_school_minnows.png" alt="fish_school_minnows.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_school_minnows.png</div>
+          <div class="meta"><span>22 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/fish_shadowy_cod_m.png" alt="fish_shadowy_cod_m.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_shadowy_cod_m.png</div>
+          <div class="meta"><span>11 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/fish_shadowy_flounder_m.png" alt="fish_shadowy_flounder_m.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_shadowy_flounder_m.png</div>
+          <div class="meta"><span>12 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/fish_shadowy_flounder_s.png" alt="fish_shadowy_flounder_s.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_shadowy_flounder_s.png</div>
+          <div class="meta"><span>6 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/fish_shadowy_minnow_tiny1.png" alt="fish_shadowy_minnow_tiny1.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_shadowy_minnow_tiny1.png</div>
+          <div class="meta"><span>3 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/fish_shadowy_minnow_tiny2.png" alt="fish_shadowy_minnow_tiny2.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_shadowy_minnow_tiny2.png</div>
+          <div class="meta"><span>4 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/fish_shadowy_minnow_tiny3.png" alt="fish_shadowy_minnow_tiny3.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_shadowy_minnow_tiny3.png</div>
+          <div class="meta"><span>4 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/fish_shadowy_perch_s6.png" alt="fish_shadowy_perch_s6.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_shadowy_perch_s6.png</div>
+          <div class="meta"><span>8 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <video src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/flatfish%20normal.mp4" autoplay loop muted playsinline></video>
+        </div>
+        <div class="card-info">
+          <div class="filename">flatfish normal.mp4</div>
+          <div class="meta"><span>2044 KB</span><span class="badge badge-vid">VIDEO</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <video src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/normal%20fish%20school%20alt.mp4" autoplay loop muted playsinline></video>
+        </div>
+        <div class="card-info">
+          <div class="filename">normal fish school alt.mp4</div>
+          <div class="meta"><span>3621 KB</span><span class="badge badge-vid">VIDEO</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <video src="Zone%201%20-%20The%20Shallows%20(Coastal%20Shoals)/04_Fish_and_Creatures/normal%20fish%20school.mp4" autoplay loop muted playsinline></video>
+        </div>
+        <div class="card-info">
+          <div class="filename">normal fish school.mp4</div>
+          <div class="meta"><span>4100 KB</span><span class="badge badge-vid">VIDEO</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="zone-block">
+    <div class="zone-title"><span>📂 Zone 2 - The Foggy Banks (Kelp Shallows)</span></div>
+    <div class="subcat-title">📁 01 Backgrounds and Sky (6 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/01_Backgrounds_and_Sky/bg_fishing_clean_environment.png" alt="bg_fishing_clean_environment.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">bg_fishing_clean_environment.png</div>
+          <div class="meta"><span>536 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/01_Backgrounds_and_Sky/bg_fishing_full_scene.png" alt="bg_fishing_full_scene.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">bg_fishing_full_scene.png</div>
+          <div class="meta"><span>624 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/01_Backgrounds_and_Sky/bg_fishing_skybox_clean.png" alt="bg_fishing_skybox_clean.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">bg_fishing_skybox_clean.png</div>
+          <div class="meta"><span>333 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/01_Backgrounds_and_Sky/bg_fishing_sky_moon.png" alt="bg_fishing_sky_moon.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">bg_fishing_sky_moon.png</div>
+          <div class="meta"><span>129 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/01_Backgrounds_and_Sky/bg_kelp_shallows.png" alt="bg_kelp_shallows.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">bg_kelp_shallows.png</div>
+          <div class="meta"><span>2199 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <video src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/01_Backgrounds_and_Sky/second_area.mp4" autoplay loop muted playsinline></video>
+        </div>
+        <div class="card-info">
+          <div class="filename">second_area.mp4</div>
+          <div class="meta"><span>5081 KB</span><span class="badge badge-vid">VIDEO</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="subcat-title">📁 02 Waves and Water FX (3 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/02_Waves_and_Water_FX/fx_wave_moonlit_curl.png" alt="fx_wave_moonlit_curl.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fx_wave_moonlit_curl.png</div>
+          <div class="meta"><span>111 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/02_Waves_and_Water_FX/waves_misty_swell_1024_feathered.png" alt="waves_misty_swell_1024_feathered.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">waves_misty_swell_1024_feathered.png</div>
+          <div class="meta"><span>212 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/02_Waves_and_Water_FX/waves_moonlit_crest_1024_feathered.png" alt="waves_moonlit_crest_1024_feathered.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">waves_moonlit_crest_1024_feathered.png</div>
+          <div class="meta"><span>280 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="subcat-title">📁 03 Props and Seabed (4 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/03_Props_and_Seabed/kelp_dense_cluster.png" alt="kelp_dense_cluster.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">kelp_dense_cluster.png</div>
+          <div class="meta"><span>36 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/03_Props_and_Seabed/kelp_slender_bush.png" alt="kelp_slender_bush.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">kelp_slender_bush.png</div>
+          <div class="meta"><span>19 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/03_Props_and_Seabed/prop_dock_pilings_kelp.png" alt="prop_dock_pilings_kelp.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">prop_dock_pilings_kelp.png</div>
+          <div class="meta"><span>51 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/03_Props_and_Seabed/shipwreck_wooden_hull.png" alt="shipwreck_wooden_hull.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">shipwreck_wooden_hull.png</div>
+          <div class="meta"><span>44 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="subcat-title">📁 04 Fish and Creatures (14 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/04_Fish_and_Creatures/fish_brown_mutant.png" alt="fish_brown_mutant.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_brown_mutant.png</div>
+          <div class="meta"><span>10 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/04_Fish_and_Creatures/fish_mutant_rockfish_spotted.png" alt="fish_mutant_rockfish_spotted.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_mutant_rockfish_spotted.png</div>
+          <div class="meta"><span>13 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/04_Fish_and_Creatures/fish_rockfish_mottled.png" alt="fish_rockfish_mottled.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_rockfish_mottled.png</div>
+          <div class="meta"><span>41 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/04_Fish_and_Creatures/fish_shadowy_bass_s4.png" alt="fish_shadowy_bass_s4.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_shadowy_bass_s4.png</div>
+          <div class="meta"><span>5 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/04_Fish_and_Creatures/fish_shadowy_haddock_s7.png" alt="fish_shadowy_haddock_s7.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_shadowy_haddock_s7.png</div>
+          <div class="meta"><span>5 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/04_Fish_and_Creatures/fish_shadowy_herring_m.png" alt="fish_shadowy_herring_m.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_shadowy_herring_m.png</div>
+          <div class="meta"><span>11 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/04_Fish_and_Creatures/fish_shadowy_mackerel_s1.png" alt="fish_shadowy_mackerel_s1.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_shadowy_mackerel_s1.png</div>
+          <div class="meta"><span>7 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/04_Fish_and_Creatures/fish_shadowy_shad_s5.png" alt="fish_shadowy_shad_s5.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_shadowy_shad_s5.png</div>
+          <div class="meta"><span>5 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/04_Fish_and_Creatures/fish_shadowy_smelt_s3.png" alt="fish_shadowy_smelt_s3.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_shadowy_smelt_s3.png</div>
+          <div class="meta"><span>5 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/04_Fish_and_Creatures/fish_shadowy_trout_s2.png" alt="fish_shadowy_trout_s2.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_shadowy_trout_s2.png</div>
+          <div class="meta"><span>5 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/04_Fish_and_Creatures/fish_spiky_sculpin.png" alt="fish_spiky_sculpin.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_spiky_sculpin.png</div>
+          <div class="meta"><span>12 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/04_Fish_and_Creatures/fish_teal_snapper.png" alt="fish_teal_snapper.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_teal_snapper.png</div>
+          <div class="meta"><span>8 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/04_Fish_and_Creatures/shadow_fish_medium_1.png" alt="shadow_fish_medium_1.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">shadow_fish_medium_1.png</div>
+          <div class="meta"><span>3 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%202%20-%20The%20Foggy%20Banks%20(Kelp%20Shallows)/04_Fish_and_Creatures/shadow_fish_medium_2.png" alt="shadow_fish_medium_2.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">shadow_fish_medium_2.png</div>
+          <div class="meta"><span>4 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="zone-block">
+    <div class="zone-title"><span>📂 Zone 3 - The Sunken Reefs (Abyssal Trench)</span></div>
+    <div class="subcat-title">📁 01 Backgrounds and Sky (3 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/01_Backgrounds_and_Sky/bg_abyssal_shipwreck.png" alt="bg_abyssal_shipwreck.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">bg_abyssal_shipwreck.png</div>
+          <div class="meta"><span>208 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/01_Backgrounds_and_Sky/bg_fishing_seabed_floor.png" alt="bg_fishing_seabed_floor.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">bg_fishing_seabed_floor.png</div>
+          <div class="meta"><span>148 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/01_Backgrounds_and_Sky/bg_fishing_underwater_abyss.png" alt="bg_fishing_underwater_abyss.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">bg_fishing_underwater_abyss.png</div>
+          <div class="meta"><span>60 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="subcat-title">📁 02 Waves and Water FX (7 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/02_Waves_and_Water_FX/fx_seafoam_patch_heavy.png" alt="fx_seafoam_patch_heavy.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fx_seafoam_patch_heavy.png</div>
+          <div class="meta"><span>128 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/02_Waves_and_Water_FX/fx_wave_claw_surge_right.png" alt="fx_wave_claw_surge_right.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fx_wave_claw_surge_right.png</div>
+          <div class="meta"><span>125 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/02_Waves_and_Water_FX/fx_wave_crashing_breaker_left.png" alt="fx_wave_crashing_breaker_left.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fx_wave_crashing_breaker_left.png</div>
+          <div class="meta"><span>137 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/02_Waves_and_Water_FX/fx_wave_whitecap_spray_crest.png" alt="fx_wave_whitecap_spray_crest.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fx_wave_whitecap_spray_crest.png</div>
+          <div class="meta"><span>133 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/02_Waves_and_Water_FX/waves_storm_breaker_1024.png" alt="waves_storm_breaker_1024.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">waves_storm_breaker_1024.png</div>
+          <div class="meta"><span>313 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/02_Waves_and_Water_FX/waves_storm_breaker_1024_feathered.png" alt="waves_storm_breaker_1024_feathered.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">waves_storm_breaker_1024_feathered.png</div>
+          <div class="meta"><span>313 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/02_Waves_and_Water_FX/waves_storm_breaker_strip.png" alt="waves_storm_breaker_strip.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">waves_storm_breaker_strip.png</div>
+          <div class="meta"><span>242 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="subcat-title">📁 03 Props and Shipwreck (8 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/03_Props_and_Shipwreck/prop_biolum_anemone_cup.png" alt="prop_biolum_anemone_cup.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">prop_biolum_anemone_cup.png</div>
+          <div class="meta"><span>15 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/03_Props_and_Shipwreck/prop_biolum_anemone_teal.png" alt="prop_biolum_anemone_teal.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">prop_biolum_anemone_teal.png</div>
+          <div class="meta"><span>27 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/03_Props_and_Shipwreck/shadow_drifting_kraken_tentacles.png" alt="shadow_drifting_kraken_tentacles.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">shadow_drifting_kraken_tentacles.png</div>
+          <div class="meta"><span>8 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/03_Props_and_Shipwreck/shadow_giant_sea_serpent.png" alt="shadow_giant_sea_serpent.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">shadow_giant_sea_serpent.png</div>
+          <div class="meta"><span>6 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/03_Props_and_Shipwreck/shadow_kraken_tentacles_bg.png" alt="shadow_kraken_tentacles_bg.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">shadow_kraken_tentacles_bg.png</div>
+          <div class="meta"><span>34 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/03_Props_and_Shipwreck/shadow_mini_kraken_eye.png" alt="shadow_mini_kraken_eye.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">shadow_mini_kraken_eye.png</div>
+          <div class="meta"><span>3 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/03_Props_and_Shipwreck/shadow_serpent_coiling_s.png" alt="shadow_serpent_coiling_s.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">shadow_serpent_coiling_s.png</div>
+          <div class="meta"><span>7 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/03_Props_and_Shipwreck/shipwreck_abyssal_galleon.png" alt="shipwreck_abyssal_galleon.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">shipwreck_abyssal_galleon.png</div>
+          <div class="meta"><span>172 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="subcat-title">📁 04 Fish and Horrors (19 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/fish_abyssal_eel.png" alt="fish_abyssal_eel.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_abyssal_eel.png</div>
+          <div class="meta"><span>26 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/fish_angler_pale_lure.png" alt="fish_angler_pale_lure.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_angler_pale_lure.png</div>
+          <div class="meta"><span>46 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/fish_mutant_amber_glow_eye.png" alt="fish_mutant_amber_glow_eye.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_mutant_amber_glow_eye.png</div>
+          <div class="meta"><span>8 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/fish_mutant_angler_lure.png" alt="fish_mutant_angler_lure.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_mutant_angler_lure.png</div>
+          <div class="meta"><span>15 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/fish_mutant_biolum_green.png" alt="fish_mutant_biolum_green.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_mutant_biolum_green.png</div>
+          <div class="meta"><span>54 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/fish_mutant_biolum_spots.png" alt="fish_mutant_biolum_spots.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_mutant_biolum_spots.png</div>
+          <div class="meta"><span>17 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/fish_mutant_cthulhu_mouth.png" alt="fish_mutant_cthulhu_mouth.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_mutant_cthulhu_mouth.png</div>
+          <div class="meta"><span>15 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/fish_mutant_pale_gut_large.png" alt="fish_mutant_pale_gut_large.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_mutant_pale_gut_large.png</div>
+          <div class="meta"><span>11 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/fish_mutant_pale_gut_small.png" alt="fish_mutant_pale_gut_small.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_mutant_pale_gut_small.png</div>
+          <div class="meta"><span>12 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/fish_mutant_spiny_whiskers.png" alt="fish_mutant_spiny_whiskers.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_mutant_spiny_whiskers.png</div>
+          <div class="meta"><span>19 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/fish_mutant_tiny_luminescent.png" alt="fish_mutant_tiny_luminescent.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_mutant_tiny_luminescent.png</div>
+          <div class="meta"><span>4 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/fish_mutant_wolf_eel.png" alt="fish_mutant_wolf_eel.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_mutant_wolf_eel.png</div>
+          <div class="meta"><span>8 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/fish_puffer_minnow_mutant.png" alt="fish_puffer_minnow_mutant.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_puffer_minnow_mutant.png</div>
+          <div class="meta"><span>17 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/fish_scorpionfish_armored.png" alt="fish_scorpionfish_armored.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_scorpionfish_armored.png</div>
+          <div class="meta"><span>52 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/fish_violet_angler.png" alt="fish_violet_angler.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_violet_angler.png</div>
+          <div class="meta"><span>13 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/fish_visceral_gut_swollen.png" alt="fish_visceral_gut_swollen.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_visceral_gut_swollen.png</div>
+          <div class="meta"><span>44 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/shadow_bulbous_horror_eyes.png" alt="shadow_bulbous_horror_eyes.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">shadow_bulbous_horror_eyes.png</div>
+          <div class="meta"><span>9 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/shadow_spiky_abyssal_predator.png" alt="shadow_spiky_abyssal_predator.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">shadow_spiky_abyssal_predator.png</div>
+          <div class="meta"><span>6 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%203%20-%20The%20Sunken%20Reefs%20(Abyssal%20Trench)/04_Fish_and_Horrors/shadow_swimming_cuttlefish.png" alt="shadow_swimming_cuttlefish.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">shadow_swimming_cuttlefish.png</div>
+          <div class="meta"><span>6 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="zone-block">
+    <div class="zone-title"><span>📂 Zone 4 - The Eldritch Trench (Subterranean Sea Cave)</span></div>
+    <div class="subcat-title">📁 01 Backgrounds and Ceiling (2 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%204%20-%20The%20Eldritch%20Trench%20(Subterranean%20Sea%20Cave)/01_Backgrounds_and_Ceiling/bg_subterranean_cave.png" alt="bg_subterranean_cave.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">bg_subterranean_cave.png</div>
+          <div class="meta"><span>184 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%204%20-%20The%20Eldritch%20Trench%20(Subterranean%20Sea%20Cave)/01_Backgrounds_and_Ceiling/prop_cave_stalactites.png" alt="prop_cave_stalactites.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">prop_cave_stalactites.png</div>
+          <div class="meta"><span>47 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="subcat-title">📁 02 Waves and Churning Brine (6 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%204%20-%20The%20Eldritch%20Trench%20(Subterranean%20Sea%20Cave)/02_Waves_and_Churning_Brine/fx_seafoam_churning_surf.png" alt="fx_seafoam_churning_surf.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fx_seafoam_churning_surf.png</div>
+          <div class="meta"><span>124 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%204%20-%20The%20Eldritch%20Trench%20(Subterranean%20Sea%20Cave)/02_Waves_and_Churning_Brine/fx_wave_crashing_breaker_left.png" alt="fx_wave_crashing_breaker_left.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fx_wave_crashing_breaker_left.png</div>
+          <div class="meta"><span>137 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%204%20-%20The%20Eldritch%20Trench%20(Subterranean%20Sea%20Cave)/02_Waves_and_Churning_Brine/fx_wave_whitecap_spray_crest.png" alt="fx_wave_whitecap_spray_crest.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fx_wave_whitecap_spray_crest.png</div>
+          <div class="meta"><span>133 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%204%20-%20The%20Eldritch%20Trench%20(Subterranean%20Sea%20Cave)/02_Waves_and_Churning_Brine/waves_churning_foam_1024.png" alt="waves_churning_foam_1024.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">waves_churning_foam_1024.png</div>
+          <div class="meta"><span>295 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%204%20-%20The%20Eldritch%20Trench%20(Subterranean%20Sea%20Cave)/02_Waves_and_Churning_Brine/waves_churning_foam_1024_feathered.png" alt="waves_churning_foam_1024_feathered.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">waves_churning_foam_1024_feathered.png</div>
+          <div class="meta"><span>295 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%204%20-%20The%20Eldritch%20Trench%20(Subterranean%20Sea%20Cave)/02_Waves_and_Churning_Brine/waves_churning_foam_strip.png" alt="waves_churning_foam_strip.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">waves_churning_foam_strip.png</div>
+          <div class="meta"><span>228 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="subcat-title">📁 03 Thermal Vents and Anchors (2 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%204%20-%20The%20Eldritch%20Trench%20(Subterranean%20Sea%20Cave)/03_Thermal_Vents_and_Anchors/prop_cave_chimney_vent.png" alt="prop_cave_chimney_vent.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">prop_cave_chimney_vent.png</div>
+          <div class="meta"><span>20 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%204%20-%20The%20Eldritch%20Trench%20(Subterranean%20Sea%20Cave)/03_Thermal_Vents_and_Anchors/prop_sea_cave_anchor.png" alt="prop_sea_cave_anchor.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">prop_sea_cave_anchor.png</div>
+          <div class="meta"><span>22 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="subcat-title">📁 04 Apex Horrors and Dagon (6 items)</div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%204%20-%20The%20Eldritch%20Trench%20(Subterranean%20Sea%20Cave)/04_Apex_Horrors_and_Dagon/fish_cthulhu_tentacled.png" alt="fish_cthulhu_tentacled.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_cthulhu_tentacled.png</div>
+          <div class="meta"><span>78 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%204%20-%20The%20Eldritch%20Trench%20(Subterranean%20Sea%20Cave)/04_Apex_Horrors_and_Dagon/fish_leviathan_horror.png" alt="fish_leviathan_horror.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">fish_leviathan_horror.png</div>
+          <div class="meta"><span>24 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%204%20-%20The%20Eldritch%20Trench%20(Subterranean%20Sea%20Cave)/04_Apex_Horrors_and_Dagon/leviathan_abyssal_maw_worm.png" alt="leviathan_abyssal_maw_worm.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">leviathan_abyssal_maw_worm.png</div>
+          <div class="meta"><span>116 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%204%20-%20The%20Eldritch%20Trench%20(Subterranean%20Sea%20Cave)/04_Apex_Horrors_and_Dagon/leviathan_apex_dagon.png" alt="leviathan_apex_dagon.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">leviathan_apex_dagon.png</div>
+          <div class="meta"><span>261 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%204%20-%20The%20Eldritch%20Trench%20(Subterranean%20Sea%20Cave)/04_Apex_Horrors_and_Dagon/leviathan_bioluminescent_squid.png" alt="leviathan_bioluminescent_squid.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">leviathan_bioluminescent_squid.png</div>
+          <div class="meta"><span>103 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb-container">
+          <img src="Zone%204%20-%20The%20Eldritch%20Trench%20(Subterranean%20Sea%20Cave)/04_Apex_Horrors_and_Dagon/leviathan_kraken_worm_colossus.png" alt="leviathan_kraken_worm_colossus.png" loading="lazy" />
+        </div>
+        <div class="card-info">
+          <div class="filename">leviathan_kraken_worm_colossus.png</div>
+          <div class="meta"><span>213 KB</span><span class="badge badge-png">PNG</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
