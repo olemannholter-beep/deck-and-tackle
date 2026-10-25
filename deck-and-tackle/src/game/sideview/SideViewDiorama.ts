@@ -151,12 +151,18 @@ export class SideViewDiorama {
       'fish_spiky_sculpin.png',
       'fish_angler_pale_lure.png',
       'leviathan_apex_dagon.png',
-      // Modular small fish sprites & animated Zone 1 sheets
+      // Modular small fish sprites & animated Zone 1 + Zone 2 sheets
       'fish_animated_minnow_sheet.png',
       'fish_animated_flatfish_sheet.png',
       'fish_animated_school_sheet.png',
       'fish_animated_school_alt_sheet.png',
       'prop_animated_kelp_sheet.png',
+      'fish_z2_tentacle_sculpin_sheet.png',
+      'fish_z2_dark_rockfish_sheet.png',
+      'fish_z2_spotted_mutant_sheet.png',
+      'fish_z2_shadow_medium_sheet.png',
+      'prop_z2_ocean_kelp_sheet.png',
+      'prop_z2_sea_kelp_sheet.png',
       'fish_animated_minnow.png',
       'fish_shadowy_minnow_tiny1.png',
       'fish_shadowy_minnow_tiny2.png',
@@ -526,6 +532,131 @@ export class SideViewDiorama {
       return;
     }
 
+    // Zone 2 (The Foggy Banks / Kelp Shallows): ONLY spawn the new Zone 2 animated fish sheets and remove all old static fish
+    if (tier === 2) {
+      const zone2FishSpecs: Array<{
+        spriteName: string;
+        xRatio: number;
+        depthRatio: number;
+        w: number;
+        aspect: number;
+        speed: number;
+        isLeft: boolean;
+        alpha: number;
+        kind: 'minnow' | 'midwater' | 'bottom_dweller';
+      }> = [
+        {
+          spriteName: 'fish_z2_shadow_medium_sheet.png',
+          xRatio: 0.24,
+          depthRatio: 0.24,
+          w: 98,
+          aspect: 64 / 180,
+          speed: 26,
+          isLeft: false,
+          alpha: 0.44,
+          kind: 'minnow'
+        },
+        {
+          spriteName: 'fish_z2_shadow_medium_sheet.png',
+          xRatio: 0.68,
+          depthRatio: 0.32,
+          w: 88,
+          aspect: 64 / 180,
+          speed: 24,
+          isLeft: true,
+          alpha: 0.40,
+          kind: 'minnow'
+        },
+        {
+          spriteName: 'fish_z2_dark_rockfish_sheet.png',
+          xRatio: 0.18,
+          depthRatio: 0.40,
+          w: 128,
+          aspect: 125 / 220,
+          speed: 20,
+          isLeft: false,
+          alpha: 0.48,
+          kind: 'midwater'
+        },
+        {
+          spriteName: 'fish_z2_spotted_mutant_sheet.png',
+          xRatio: 0.56,
+          depthRatio: 0.48,
+          w: 142,
+          aspect: 116 / 230,
+          speed: 22,
+          isLeft: true,
+          alpha: 0.48,
+          kind: 'midwater'
+        },
+        {
+          spriteName: 'fish_z2_dark_rockfish_sheet.png',
+          xRatio: 0.80,
+          depthRatio: 0.56,
+          w: 118,
+          aspect: 125 / 220,
+          speed: 19,
+          isLeft: true,
+          alpha: 0.46,
+          kind: 'midwater'
+        },
+        {
+          spriteName: 'fish_z2_tentacle_sculpin_sheet.png',
+          xRatio: 0.34,
+          depthRatio: 0.65,
+          w: 148,
+          aspect: 140 / 220,
+          speed: 16,
+          isLeft: false,
+          alpha: 0.50,
+          kind: 'midwater'
+        },
+        {
+          spriteName: 'fish_z2_spotted_mutant_sheet.png',
+          xRatio: 0.72,
+          depthRatio: 0.72,
+          w: 132,
+          aspect: 116 / 230,
+          speed: 18,
+          isLeft: false,
+          alpha: 0.44,
+          kind: 'midwater'
+        },
+        {
+          spriteName: 'fish_z2_tentacle_sculpin_sheet.png',
+          xRatio: 0.50,
+          depthRatio: 0.80,
+          w: 156,
+          aspect: 140 / 220,
+          speed: 15,
+          isLeft: true,
+          alpha: 0.52,
+          kind: 'bottom_dweller'
+        }
+      ];
+
+      for (let i = 0; i < zone2FishSpecs.length; i++) {
+        const spec = zone2FishSpecs[i];
+        const fishW = spec.w;
+        const fishH = Math.round(fishW * spec.aspect);
+        this.ambientFish.push({
+          x: width * spec.xRatio,
+          y: waterLevelY + underwaterH * spec.depthRatio,
+          vx: (spec.isLeft ? -1 : 1) * (spec.speed + (i % 3) * 2),
+          vy: spec.kind === 'bottom_dweller' ? (Math.random() - 0.5) * 1.5 : (Math.random() - 0.5) * 3.5,
+          w: fishW,
+          h: fishH,
+          spriteName: spec.spriteName,
+          alpha: spec.alpha,
+          tailPhase: i * 1.4 + Math.random() * 0.4,
+          tailSpeed: 4 + Math.random() * 2,
+          schoolId: i,
+          kind: spec.kind
+        });
+      }
+      return;
+    }
+
     // 1. Primary school of fish in midwater (Zones 2-4)
     const schoolBaseY = waterLevelY + underwaterH * 0.28;
     const minnowSprites = [
@@ -533,7 +664,7 @@ export class SideViewDiorama {
       'fish_shadowy_minnow_tiny2.png',
       'fish_shadowy_minnow_tiny3.png'
     ];
-    const schoolSprites = tier === 2 ? ['fish_shadowy_smelt_s3.png', ...minnowSprites] : minnowSprites;
+    const schoolSprites = minnowSprites;
 
     const schoolCount = tier === 4 ? 6 : 10;
     for (let i = 0; i < schoolCount; i++) {
@@ -731,7 +862,7 @@ export class SideViewDiorama {
     // Initialize ambient fish when viewport dimensions or zone tier change
     const currentTier = this.activeTier;
     const needsShoalRefresh =
-      currentTier === 1 &&
+      (currentTier === 1 || currentTier === 2) &&
       (this.ambientFish.length === 0 ||
         this.ambientFish.some((f) => !f.spriteName.endsWith('_sheet.png')));
     if (this.ambientInitWidth !== viewportWidth || this.lastActiveTier !== currentTier || needsShoalRefresh) {
@@ -750,6 +881,7 @@ export class SideViewDiorama {
       return;
     }
 
+
     // 2. Return button hover & click
     this.isReturnBtnHovered =
       mousePos.x >= this.returnBtnRect.x &&
@@ -764,12 +896,14 @@ export class SideViewDiorama {
       return;
     }
 
+
     // 3. Stage: Bobber Minigame
     if (this.stage === 'bobber') {
       this.bobberMinigame.update(dt, viewportWidth, waterLevelY);
       Input.setCursor(this.isReturnBtnHovered ? 'pointer' : 'default');
       return;
     }
+
 
     // 4. Stage: Card Battle
     this.battle.update(dt);
@@ -825,6 +959,7 @@ export class SideViewDiorama {
       return;
     }
 
+
     // End Turn Button hover, click, and Spacebar trigger
     this.endTurnBtnRect.x = viewportWidth - this.endTurnBtnRect.w - 32;
     this.endTurnBtnRect.y = Math.min(viewportHeight * 0.55, viewportHeight - 210);
@@ -840,6 +975,7 @@ export class SideViewDiorama {
       this.battle.endTurn();
       return;
     }
+
 
     // Number key shortcuts to play cards (1-5)
     for (let i = 0; i < this.battle.hand.length; i++) {
@@ -1289,15 +1425,48 @@ export class SideViewDiorama {
             ctx.restore();
           }
         } else if (f.spriteName.endsWith('_sheet.png')) {
-          const isFlatfish = f.spriteName === 'fish_animated_flatfish_sheet.png';
-          const cols = isFlatfish ? 8 : 6;
-          const cellW = 240;
-          const cellH = isFlatfish ? 140 : 116;
-          const nFrames = isFlatfish ? 56 : 24;
+          let cols = 6;
+          let cellW = 240;
+          let cellH = 116;
+          let nFrames = 24;
+          let fps = 24;
+          if (f.spriteName === 'fish_animated_flatfish_sheet.png') {
+            cols = 8;
+            cellW = 240;
+            cellH = 140;
+            nFrames = 56;
+          } else if (f.spriteName === 'fish_z2_tentacle_sculpin_sheet.png') {
+            cols = 12;
+            cellW = 220;
+            cellH = 140;
+            nFrames = 144;
+          } else if (f.spriteName === 'fish_z2_dark_rockfish_sheet.png') {
+            cols = 12;
+            cellW = 220;
+            cellH = 125;
+            nFrames = 144;
+          } else if (f.spriteName === 'fish_z2_spotted_mutant_sheet.png') {
+            cols = 12;
+            cellW = 230;
+            cellH = 116;
+            nFrames = 144;
+          } else if (f.spriteName === 'fish_z2_shadow_medium_sheet.png') {
+            cols = 6;
+            cellW = 180;
+            cellH = 64;
+            nFrames = 24;
+            fps = 16;
+          }
           const cycleLen = nFrames * 2 - 2; // Seamless ping-pong across all frames
-          const constOffset = (f.schoolId ?? 0) * 13;
-          const rawIdx = Math.floor((this.time * 24 + constOffset) % cycleLen);
+          const constOffset = (f.schoolId ?? 0) * 19;
+          const exactRaw = (this.time * fps + constOffset) % cycleLen;
+          const rawIdx = Math.floor(exactRaw);
+          const nextRawIdx = (rawIdx + 1) % cycleLen;
+          const frac = exactRaw - rawIdx;
+
           const frameIdx = rawIdx < nFrames ? rawIdx : cycleLen - rawIdx;
+          const nextFrameIdx = nextRawIdx < nFrames ? nextRawIdx : cycleLen - nextRawIdx;
+
           const col = frameIdx % cols;
           const row = Math.floor(frameIdx / cols);
           ctx.drawImage(
@@ -1311,6 +1480,25 @@ export class SideViewDiorama {
             f.w,
             f.h
           );
+
+          if (frac > 0.05 && nextFrameIdx !== frameIdx) {
+            const col1 = nextFrameIdx % cols;
+            const row1 = Math.floor(nextFrameIdx / cols);
+            ctx.save();
+            ctx.globalAlpha = (f.alpha ?? 0.86) * frac;
+            ctx.drawImage(
+              img,
+              col1 * cellW,
+              row1 * cellH,
+              cellW,
+              cellH,
+              -f.w / 2,
+              -f.h / 2,
+              f.w,
+              f.h
+            );
+            ctx.restore();
+          }
         } else {
           ctx.drawImage(img, -f.w / 2, -f.h / 2, f.w, f.h);
         }
@@ -1851,38 +2039,47 @@ export class SideViewDiorama {
       }
 
     } else if (tier === 2) {
-      // Zone 2: Phosphorescent emerald-teal water, swaying kelp forest, dock pilings
+      // Zone 2: Phosphorescent emerald-teal water, animated swaying kelp forest, dock pilings
       const pilings = SideViewDiorama.getImage('prop_dock_pilings_kelp.png');
       if (pilings && pilings.complete && pilings.naturalWidth > 0) {
         ctx.drawImage(pilings, width * 0.18 - 60, height - 190, 120, 183);
       }
 
-      // Kelp clusters swaying in current
-      const kelpCluster = SideViewDiorama.getImage('kelp_dense_cluster.png');
-      if (kelpCluster && kelpCluster.complete && kelpCluster.naturalWidth > 0) {
-        ctx.save();
-        const kSway1 = Math.sin(this.time * 1.5) * 12;
-        ctx.translate(width * 0.78, height - 155);
-        ctx.transform(1, 0, kSway1 * 0.015, 1, 0, 0);
-        ctx.drawImage(kelpCluster, -87, 0, 174, 152);
-        ctx.restore();
-      }
+      const oceanKelpSheet = SideViewDiorama.getImage('prop_z2_ocean_kelp_sheet.png');
+      const seaKelpSheet = SideViewDiorama.getImage('prop_z2_sea_kelp_sheet.png');
+      const z2KelpPlacements = [
+        { sheet: seaKelpSheet, cols: 12, cw: 150, ch: 210, nFrames: 96, x: width * 0.08, y: height - 185, w: 130, h: 182, phase: 0, flip: false, alpha: 0.90 },
+        { sheet: oceanKelpSheet, cols: 12, cw: 200, ch: 168, nFrames: 96, x: width * 0.36, y: height - 155, w: 170, h: 143, phase: 24, flip: false, alpha: 0.86 },
+        { sheet: oceanKelpSheet, cols: 12, cw: 200, ch: 168, nFrames: 96, x: width * 0.76, y: height - 165, w: 185, h: 155, phase: 48, flip: true, alpha: 0.90 },
+        { sheet: seaKelpSheet, cols: 12, cw: 150, ch: 210, nFrames: 96, x: width * 0.89, y: height - 190, w: 138, h: 193, phase: 72, flip: true, alpha: 0.92 }
+      ];
 
-      const kelpBush = SideViewDiorama.getImage('kelp_slender_bush.png');
-      if (kelpBush && kelpBush.complete && kelpBush.naturalWidth > 0) {
-        ctx.save();
-        const kSway2 = Math.sin(this.time * 1.6 + 0.8) * 14;
-        ctx.translate(width * 0.88, height - 175);
-        ctx.transform(1, 0, kSway2 * 0.015, 1, 0, 0);
-        ctx.drawImage(kelpBush, -42, 0, 84, 172);
-        ctx.restore();
-
-        ctx.save();
-        const kSway3 = Math.sin(this.time * 1.4 + 1.5) * 12;
-        ctx.translate(width * 0.08, height - 175);
-        ctx.transform(1, 0, kSway3 * 0.015, 1, 0, 0);
-        ctx.drawImage(kelpBush, -42, 0, 84, 172);
-        ctx.restore();
+      for (const kp of z2KelpPlacements) {
+        if (kp.sheet && kp.sheet.complete && kp.sheet.naturalWidth > 0) {
+          const cycleLen = kp.nFrames * 2 - 2;
+          const rawIdx = Math.floor((this.time * 24 + kp.phase) % cycleLen);
+          const frameIdx = rawIdx < kp.nFrames ? rawIdx : cycleLen - rawIdx;
+          const col = frameIdx % kp.cols;
+          const row = Math.floor(frameIdx / kp.cols);
+          ctx.save();
+          ctx.globalAlpha = kp.alpha;
+          ctx.translate(kp.x, kp.y);
+          if (kp.flip) {
+            ctx.scale(-1, 1);
+          }
+          ctx.drawImage(
+            kp.sheet,
+            col * kp.cw,
+            row * kp.ch,
+            kp.cw,
+            kp.ch,
+            -kp.w / 2,
+            0,
+            kp.w,
+            kp.h
+          );
+          ctx.restore();
+        }
       }
 
     } else if (tier === 3) {
@@ -2054,6 +2251,7 @@ export class SideViewDiorama {
     if (profile.tier < 3 || !profile.waves.foregroundBreakerSprite) {
       return;
     }
+
 
     ctx.save();
     const breaker = SideViewDiorama.getImage(profile.waves.foregroundBreakerSprite);

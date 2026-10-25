@@ -114,7 +114,9 @@ export const ZONE_PROFILES: Record<ZoneTier, ZoneProfile> = {
       'fish_animated_minnow_sheet.png',
       'fish_school_minnows.png',
       'fish_shadowy_minnow_tiny1.png',
-      'fish_shadowy_perch_s6.png'
+      'fish_shadowy_perch_s6.png',
+      'fish_flounder_benthic.png',
+      'fish_gray_cod.png'
     ]
   },
   2: {
@@ -164,7 +166,9 @@ export const ZONE_PROFILES: Record<ZoneTier, ZoneProfile> = {
     ambientFishSprites: [
       'fish_shadowy_trout_s2.png',
       'fish_shadowy_mackerel_s1.png',
-      'fish_spiky_sculpin.png'
+      'fish_brown_mutant.png',
+      'fish_spiky_sculpin.png',
+      'fish_teal_snapper.png'
     ]
   },
   3: {
@@ -212,7 +216,9 @@ export const ZONE_PROFILES: Record<ZoneTier, ZoneProfile> = {
       ]
     },
     ambientFishSprites: [
+      'fish_abyssal_eel.png',
       'fish_angler_pale_lure.png',
+      'fish_visceral_gut_swollen.png',
       'fish_shadowy_minnow_tiny1.png'
     ]
   },
@@ -262,6 +268,8 @@ export const ZONE_PROFILES: Record<ZoneTier, ZoneProfile> = {
     },
     ambientFishSprites: [
       'leviathan_abyssal_maw_worm.png',
+      'fish_cthulhu_tentacled.png',
+      'leviathan_apex_dagon.png',
       'fish_angler_pale_lure.png'
     ]
   }
@@ -270,23 +278,41 @@ export const ZONE_PROFILES: Record<ZoneTier, ZoneProfile> = {
 /**
  * Resolves the ZoneTier (1..4) based on WaterZoneType, active species, and encounter depth.
  * Priority:
- * 1. Apex boss (speciesType 'dagon') or explicit zoneType 'cave' or depth >= 100m -> Tier 4
- * 2. Void creature (speciesType 'gar') or zoneType 'abyss' or depth >= 60m -> Tier 3
- * 3. Lake predator (speciesType 'pike') or zoneType 'lake' or depth >= 30m -> Tier 2
- * 4. Default / Coastal perch (speciesType 'perch') or zoneType 'shallow' -> Tier 1
+ * 1. Tier 4 species ('dagon' | 'cthulhu_spawn' | 'maw_worm'), zoneType 'cave', or depth >= 100m -> Tier 4
+ * 2. Tier 3 species ('gar' | 'angler' | 'gulper'), zoneType 'abyss', or depth >= 60m -> Tier 3
+ * 3. Tier 2 species ('pike' | 'sculpin' | 'teal_snapper'), zoneType 'lake', or depth >= 30m -> Tier 2
+ * 4. Default / Tier 1 species ('perch' | 'flounder' | 'ghost_cod') or zoneType 'shallow' -> Tier 1
  */
 export function resolveZoneTier(
   zoneType: WaterZoneType,
   speciesType?: SpeciesType,
   depthMeters?: number
 ): ZoneTier {
-  if (speciesType === 'dagon' || zoneType === 'cave' || (depthMeters !== undefined && depthMeters >= 100)) {
+  if (
+    speciesType === 'dagon' ||
+    speciesType === 'cthulhu_spawn' ||
+    speciesType === 'maw_worm' ||
+    zoneType === 'cave' ||
+    (depthMeters !== undefined && depthMeters >= 100)
+  ) {
     return 4;
   }
-  if (speciesType === 'gar' || zoneType === 'abyss' || (depthMeters !== undefined && depthMeters >= 60)) {
+  if (
+    speciesType === 'gar' ||
+    speciesType === 'angler' ||
+    speciesType === 'gulper' ||
+    zoneType === 'abyss' ||
+    (depthMeters !== undefined && depthMeters >= 60)
+  ) {
     return 3;
   }
-  if (speciesType === 'pike' || zoneType === 'lake' || (depthMeters !== undefined && depthMeters >= 30)) {
+  if (
+    speciesType === 'pike' ||
+    speciesType === 'sculpin' ||
+    speciesType === 'teal_snapper' ||
+    zoneType === 'lake' ||
+    (depthMeters !== undefined && depthMeters >= 30)
+  ) {
     return 2;
   }
   return 1;

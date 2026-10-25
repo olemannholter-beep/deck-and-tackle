@@ -23,21 +23,140 @@ export class FishVisualSocket extends VisualSocket<FishRenderData> {
     FishVisualSocket.initSprites();
   }
 
+  public static readonly SPECIES_VISUAL_CONFIGS: Record<SpeciesType, {
+    w: number;
+    h: number;
+    mouthX: number;
+    mouthY: number;
+    spritePath: string;
+    glowColor?: string;
+  }> = {
+    // Zone 1
+    perch: {
+      w: 140,
+      h: 70,
+      mouthX: -58,
+      mouthY: 2,
+      spritePath: '/assets/sprites/fishing/fish_shadowy_perch_s6.png'
+    },
+    flounder: {
+      w: 150,
+      h: 80,
+      mouthX: -65,
+      mouthY: 4,
+      spritePath: '/assets/sprites/fishing/fish_flounder_benthic.png'
+    },
+    ghost_cod: {
+      w: 160,
+      h: 80,
+      mouthX: -70,
+      mouthY: 0,
+      spritePath: '/assets/sprites/fishing/fish_gray_cod.png',
+      glowColor: 'rgba(226, 232, 240, 0.40)'
+    },
+
+    // Zone 2
+    pike: {
+      w: 180,
+      h: 90,
+      mouthX: -76,
+      mouthY: 2,
+      spritePath: '/assets/sprites/fishing/fish_brown_mutant.png'
+    },
+    sculpin: {
+      w: 170,
+      h: 95,
+      mouthX: -72,
+      mouthY: 5,
+      spritePath: '/assets/sprites/fishing/fish_spiky_sculpin.png'
+    },
+    teal_snapper: {
+      w: 180,
+      h: 95,
+      mouthX: -78,
+      mouthY: -2,
+      spritePath: '/assets/sprites/fishing/fish_teal_snapper.png',
+      glowColor: 'rgba(45, 212, 191, 0.65)'
+    },
+
+    // Zone 3
+    gar: {
+      w: 220,
+      h: 110,
+      mouthX: -94,
+      mouthY: -2,
+      spritePath: '/assets/sprites/fishing/fish_abyssal_eel.png',
+      glowColor: 'rgba(56, 189, 248, 0.60)'
+    },
+    angler: {
+      w: 210,
+      h: 130,
+      mouthX: -90,
+      mouthY: 6,
+      spritePath: '/assets/sprites/fishing/fish_angler_pale_lure.png',
+      glowColor: 'rgba(254, 240, 138, 0.65)'
+    },
+    gulper: {
+      w: 230,
+      h: 120,
+      mouthX: -100,
+      mouthY: 4,
+      spritePath: '/assets/sprites/fishing/fish_visceral_gut_swollen.png',
+      glowColor: 'rgba(244, 63, 94, 0.50)'
+    },
+
+    // Zone 4
+    maw_worm: {
+      w: 260,
+      h: 140,
+      mouthX: -115,
+      mouthY: 0,
+      spritePath: '/assets/sprites/fishing/leviathan_abyssal_maw_worm.png',
+      glowColor: 'rgba(249, 115, 22, 0.60)'
+    },
+    cthulhu_spawn: {
+      w: 280,
+      h: 160,
+      mouthX: -120,
+      mouthY: 8,
+      spritePath: '/assets/sprites/fishing/fish_cthulhu_tentacled.png',
+      glowColor: 'rgba(168, 85, 247, 0.70)'
+    },
+    dagon: {
+      w: 340,
+      h: 220,
+      mouthX: -145,
+      mouthY: 14,
+      spritePath: '/assets/sprites/fishing/leviathan_apex_dagon.png',
+      glowColor: 'rgba(56, 189, 248, 0.75)'
+    }
+  };
+
+  public static getSprite(species: string): HTMLImageElement | undefined {
+    return FishVisualSocket.spriteMap.get(species);
+  }
+
+  public static getSpeciesVisualConfig(species: SpeciesType | string) {
+    if (species in FishVisualSocket.SPECIES_VISUAL_CONFIGS) {
+      return FishVisualSocket.SPECIES_VISUAL_CONFIGS[species as SpeciesType];
+    }
+    return {
+      w: 140,
+      h: 70,
+      mouthX: -58,
+      mouthY: 2,
+      spritePath: '/assets/sprites/fishing/fish_shadowy_perch_s6.png'
+    };
+  }
+
   private static initSprites(): void {
     if (FishVisualSocket.spritesLoaded) return;
     FishVisualSocket.spritesLoaded = true;
 
-    const files = [
-      { key: 'perch', path: '/assets/sprites/fishing/fish_shadowy_perch_s6.png' },
-      { key: 'pike', path: '/assets/sprites/fishing/fish_spiky_sculpin.png' },
-      { key: 'gar', path: '/assets/sprites/fishing/fish_angler_pale_lure.png' },
-      { key: 'dagon', path: '/assets/sprites/fishing/leviathan_apex_dagon.png' }
-    ];
-
-    for (const f of files) {
+    for (const [key, cfg] of Object.entries(FishVisualSocket.SPECIES_VISUAL_CONFIGS)) {
       const img = new Image();
-      img.src = f.path;
-      FishVisualSocket.spriteMap.set(f.key, img);
+      img.src = cfg.spritePath;
+      FishVisualSocket.spriteMap.set(key, img);
     }
   }
 
@@ -67,21 +186,10 @@ export class FishVisualSocket extends VisualSocket<FishRenderData> {
       ctx.save();
 
       // Configure dimensions and mouth socket per species
-      let w = 140;
-      let h = 70;
-      let mouthX = -58;
-      let mouthY = 2;
-
-      if (species === 'perch') {
-        w = 140; h = 70; mouthX = -58; mouthY = 2;
-      } else if (species === 'pike') {
-        w = 180; h = 90; mouthX = -76; mouthY = 2;
-      } else if (species === 'gar') {
-        w = 220; h = 120; mouthX = -94; mouthY = -2;
-      } else if (species === 'dagon') {
-        w = 320; h = 210; mouthX = -135; mouthY = 12;
-      }
-      this.mouthSocket.set(mouthX, mouthY);
+      const visualConfig = FishVisualSocket.getSpeciesVisualConfig(species);
+      const w = visualConfig.w;
+      const h = visualConfig.h;
+      this.mouthSocket.set(visualConfig.mouthX, visualConfig.mouthY);
 
       // Swimming undulating body oscillation
       const bodySway = Math.sin(t * 3.0) * (thrash > 0.5 ? 8 : 3.5);
@@ -89,9 +197,9 @@ export class FishVisualSocket extends VisualSocket<FishRenderData> {
       ctx.translate(0, bodySway);
       ctx.rotate(bodyTilt);
 
-      // Bioluminescent glow aura for deeper predators
-      if (species === 'gar' || species === 'dagon') {
-        ctx.shadowColor = species === 'dagon' ? 'rgba(56, 189, 248, 0.75)' : 'rgba(52, 211, 153, 0.55)';
+      // Bioluminescent glow aura
+      if (visualConfig.glowColor) {
+        ctx.shadowColor = visualConfig.glowColor;
         ctx.shadowBlur = 18 * bioPulse;
       }
 

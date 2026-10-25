@@ -302,8 +302,8 @@ export class BobberMinigame {
       ctx.stroke();
     }
 
-    // 3. Underwater Fish Shadow circling under target landing point (Zones 2-4 only; Shoals use animated minnows)
-    if (this.zoneType !== 'shallow') {
+    // 3. Underwater Fish Shadow circling under target landing point (Zones 3-4 only; Zones 1-2 use animated fish)
+    if (this.zoneType !== 'shallow' && this.zoneType !== 'lake') {
       const shadowAnchorX = this.phase === 'power_charge' ? width * 0.60 : this.bobberPos.x;
       const fishDistRatio = this.phase === 'casting' || this.phase === 'power_charge' ? 1.0 : Math.max(0, 1 - (this.nibbleCount / (this.targetNibbles + 1)));
       const fishX = shadowAnchorX + Math.sin(this.time * 2) * (25 + fishDistRatio * 45);
