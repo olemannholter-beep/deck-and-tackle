@@ -1,75 +1,16 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <title>Deck &amp; Tackle — 2D Top-Down Exploration &amp; Side-Profile Angling</title>
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <title>Deck &amp; Tackle â€” 2D Top-Down Exploration &amp; Side-Profile Angling</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Crimson+Pro:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" crossorigin href="./assets/index-BJCxxQ8o.css">
-    <script type="module" crossorigin src="./assets/index-DxYNvR9v.js"></script>
-    <style>
-      /* Fallback background while fonts and textures initialize */
-      html, body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        background-color: #020617;
-        overflow: hidden;
-      }
-      #game-canvas {
-        display: block;
-        width: 100%;
-        height: 100%;
-      }
-    </style>
+    <script type="module" src="./assets/index-EF_MW-z5.js"></script>
+    <link rel="stylesheet" href="./assets/index-BJCxxQ8o.css">
   </head>
   <body>
     <canvas id="game-canvas"></canvas>
-    <script>
-      // macOS File Protocol Assistant:
-      // If a user opens index.html directly from Finder via file:// instead of Play_Mac.command,
-      // modern Mac browsers (Safari/Chrome) block ES modules and Web Audio loading.
-      // This friendly guide informs them how to run it with 1 click.
-      if (window.location.protocol === 'file:') {
-        window.addEventListener('DOMContentLoaded', () => {
-          const banner = document.createElement('div');
-          banner.id = 'mac-file-notice';
-          banner.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(8,12,20,0.94);color:#f1f5f9;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999999;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center;padding:24px;box-sizing:border-box;';
-          banner.innerHTML = `
-            <div style="max-width:560px;background:#1e293b;border:2px solid #38bdf8;border-radius:12px;padding:32px;box-shadow:0 24px 48px rgba(0,0,0,0.7);">
-              <div style="font-size:44px;margin-bottom:12px;">⚓ 🍎</div>
-              <h2 style="font-size:22px;font-weight:bold;margin:0 0 12px 0;color:#38bdf8;letter-spacing:0.5px;">Deck &amp; Tackle on macOS</h2>
-              <p style="font-size:14px;line-height:1.6;color:#cbd5e1;margin-bottom:20px;">
-                You opened this file directly from the filesystem (<code>file://</code>). macOS browsers restrict video streaming and audio playback over direct file URLs.
-              </p>
-              <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px;margin-bottom:16px;text-align:left;">
-                <p style="margin:0 0 6px 0;font-weight:bold;color:#34d399;font-size:14px;">⚡ Recommended (1-Click Play):</p>
-                <p style="margin:0;color:#e2e8f0;font-size:13px;line-height:1.5;">
-                  Double-click <strong><code>Play_Mac.command</code></strong> in this <code>MAC</code> folder! It launches the local server and opens the game directly in Safari/Chrome with full video &amp; sound.
-                </p>
-              </div>
-              <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px;margin-bottom:20px;text-align:left;">
-                <p style="margin:0 0 6px 0;font-weight:bold;color:#60a5fa;font-size:14px;">💻 Terminal Command:</p>
-                <code style="display:block;background:#020617;padding:8px 10px;border-radius:4px;color:#38bdf8;font-family:monospace;font-size:12px;overflow-x:auto;">
-                  python3 -m http.server 8080
-                </code>
-                <p style="margin:6px 0 0 0;color:#94a3b8;font-size:12px;">Then navigate to <strong>http://localhost:8080</strong></p>
-              </div>
-              <button id="dismiss-file-notice" style="background:#0284c7;color:white;border:none;padding:10px 22px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">
-                Continue Anyway
-              </button>
-            </div>
-          `;
-          document.body.appendChild(banner);
-          document.getElementById('dismiss-file-notice')?.addEventListener('click', () => {
-            banner.remove();
-          });
-        });
-      }
-    </script>
   </body>
 </html>

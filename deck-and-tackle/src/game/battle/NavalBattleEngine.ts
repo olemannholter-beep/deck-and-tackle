@@ -677,108 +677,301 @@ export class NavalBattleEngine implements ICombatEngine {
   }
 
   private renderHand(ctx: CanvasRenderingContext2D, width: number, height: number): void {
-    const cardW = 120;
-    const cardH = 150;
-    const gap = 14;
-    const totalW = this.hand.length * cardW + (this.hand.length - 1) * gap;
-    const startX = Math.floor((width - totalW) / 2);
-    const startY = height - cardH - 24;
+    // 1. Draw Pile Indicator (Bottom-Left)
+    ctx.save();
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(24, height - 76, 90, 52, 6);
+    ctx.fill();
+    ctx.stroke();
 
-    this.cardRects = [];
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 10px "Segoe UI", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('DRAW PILE', 24 + 45, height - 58);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 18px "Segoe UI", monospace';
+    ctx.fillText(`${this.drawPile.length}`, 24 + 45, height - 36);
+    ctx.restore();
 
-    // End Turn Button (Right side)
+    // 2. Discard Pile Indicator (Bottom-Right)
+    ctx.save();
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(width - 114, height - 76, 90, 52, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = 'bold 10px "Segoe UI", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('DISCARD', width - 114 + 45, height - 58);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 18px "Segoe UI", monospace';
+    ctx.fillText(`${this.discardPile.length}`, width - 114 + 45, height - 36);
+    ctx.restore();
+
+    // 3. End Turn Button (Above Discard Pile on Right)
     this.endTurnRect = {
-      x: width - 160,
-      y: height - 80,
-      w: 130,
-      h: 42
+      x: width - 180,
+      y: height - 142,
+      w: 156,
+      h: 52
     };
 
     ctx.save();
+    ctx.fillStyle = this.isPlayerTurn
+      ? (this.isEndTurnHovered ? '#451a03' : '#1c1917')
+      : '#0f172a';
+    ctx.strokeStyle = this.isPlayerTurn
+      ? (this.isEndTurnHovered ? '#f59e0b' : '#78350f')
+      : '#475569';
+    ctx.lineWidth = this.isEndTurnHovered ? 2.4 : 1.5;
     ctx.beginPath();
     ctx.roundRect(this.endTurnRect.x, this.endTurnRect.y, this.endTurnRect.w, this.endTurnRect.h, 6);
-    ctx.fillStyle = this.isPlayerTurn
-      ? (this.isEndTurnHovered ? '#b45309' : '#78350f')
-      : '#334155';
     ctx.fill();
-    ctx.strokeStyle = this.isPlayerTurn ? '#fef08a' : '#64748b';
-    ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    ctx.font = 'bold 12px "Cinzel", serif';
-    ctx.fillStyle = this.isPlayerTurn ? '#ffffff' : '#94a3b8';
+    ctx.fillStyle = this.isPlayerTurn
+      ? (this.isEndTurnHovered ? '#fef08a' : '#fde047')
+      : '#94a3b8';
+    ctx.font = 'bold 13px "Georgia", serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(
-      this.isPlayerTurn ? 'END TURN [E]' : 'WAITING...',
+      this.isPlayerTurn ? '⏳ END TURN' : 'ENEMY FIRING...',
       this.endTurnRect.x + this.endTurnRect.w / 2,
-      this.endTurnRect.y + this.endTurnRect.h / 2
+      this.endTurnRect.y + this.endTurnRect.h / 2 - 8
+    );
+
+    ctx.fillStyle = '#cbd5e1';
+    ctx.font = 'italic 10px "Georgia", serif';
+    ctx.fillText(
+      'Enemy Salvo Next [SPACE]',
+      this.endTurnRect.x + this.endTurnRect.w / 2,
+      this.endTurnRect.y + this.endTurnRect.h / 2 + 10
     );
     ctx.restore();
 
-    // Render Hand Cards
-    for (let i = 0; i < this.hand.length; i++) {
-      const card = this.hand[i];
-      const cx = startX + i * (cardW + gap);
-      const isHovered = this.hoveredCardIndex === i;
-      const cy = isHovered ? startY - 14 : startY;
+    // 4. Curved Hand Arc & Grimoire Cards
+    const cardCount = this.hand.length;
+    this.cardRects = [];
+    if (cardCount === 0) return;
 
-      this.cardRects.push({ x: cx, y: cy, w: cardW, h: cardH, card });
+    const scale = Math.min(1.0, Math.max(0.72, width / 1280));
+    const baseW = 138;
+    const baseH = 196;
+    const cardW = baseW * scale;
+    const cardH = baseH * scale;
+    const maxHandSpan = Math.min(width - 360, cardCount * (cardW + 14));
+    const startX = (width - maxHandSpan) / 2 + cardW / 2;
+    const spacing = cardCount > 1 ? (maxHandSpan - cardW) / (cardCount - 1) : 0;
+    const baseY = height - cardH / 2 - 14;
 
-      const canAfford = this.playerStamina >= card.staminaCost;
+    const getCardLayout = (i: number) => {
+      const centerDist = i - (cardCount - 1) / 2;
+      const cx = cardCount === 1 ? width / 2 : startX + i * spacing;
+      const arcDrop = Math.pow(centerDist, 2) * 5;
+      const arcAngle = centerDist * 0.045;
+      const isHovered = i === this.hoveredCardIndex;
+      const isPlayable = this.isPlayerTurn && this.playerStamina >= this.hand[i].staminaCost;
+
+      const lift = isHovered ? 38 : 0;
+      const cy = baseY + arcDrop - lift;
+      const cardScale = scale * (isHovered ? 1.10 : 1.0);
+      const mousePos = Input.getMousePosition();
+      const tilt = isHovered ? (mousePos.x - cx) * 0.0012 : arcAngle;
+
+      return { cx, cy, cardScale, tilt, isHovered, isPlayable, card: this.hand[i] };
+    };
+
+    for (let i = 0; i < cardCount; i++) {
+      const layout = getCardLayout(i);
+      this.cardRects.push({
+        x: layout.cx - cardW / 2,
+        y: layout.cy - cardH / 2,
+        w: cardW,
+        h: cardH,
+        card: layout.card
+      });
+    }
+
+    const renderCardAt = (i: number) => {
+      const { cx, cy, cardScale, tilt, isHovered, isPlayable, card } = getCardLayout(i);
 
       ctx.save();
-      ctx.beginPath();
-      ctx.roundRect(cx, cy, cardW, cardH, 8);
-      ctx.fillStyle = canAfford ? (isHovered ? '#1e293b' : '#0f172a') : '#18181b';
-      ctx.fill();
-      ctx.strokeStyle = canAfford ? (isHovered ? '#facc15' : '#38bdf8') : '#52525b';
-      ctx.lineWidth = isHovered ? 2.5 : 1.5;
-      ctx.stroke();
+      ctx.translate(cx, cy);
+      ctx.rotate(tilt);
+      ctx.scale(cardScale, cardScale);
 
-      // Stamina Cost Gem Top-Left
-      ctx.fillStyle = canAfford ? '#0284c7' : '#52525b';
-      ctx.beginPath();
-      ctx.arc(cx + 16, cy + 16, 10, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 1.0;
-      ctx.stroke();
+      const w = baseW;
+      const h = baseH;
 
-      ctx.font = 'bold 11px sans-serif';
-      ctx.fillStyle = '#ffffff';
+      // Drop Shadow
+      ctx.fillStyle = isHovered ? 'rgba(0, 0, 0, 0.75)' : 'rgba(0, 0, 0, 0.45)';
+      ctx.beginPath();
+      ctx.roundRect(-w / 2 + 2, -h / 2 + (isHovered ? 14 : 6), w - 4, h, 8);
+      ctx.fill();
+
+      let frameColor = '#210e11';
+      let innerParchment = '#2b1b1d';
+      let headerBg = '#4c1118';
+      let eldritchGlow = '#f43f5e';
+      let typeTag = 'CANNON (ATTACK)';
+      let sigilColor = '#fca5a5';
+
+      if (card.cardType === 'Defense') {
+        frameColor = '#0b1924';
+        innerParchment = '#15242f';
+        headerBg = '#0c3047';
+        eldritchGlow = '#38bdf8';
+        typeTag = 'DEFENSE (BRACE)';
+        sigilColor = '#7dd3fc';
+      } else if (card.cardType === 'Tactic') {
+        frameColor = '#241033';
+        innerParchment = '#2d183d';
+        headerBg = '#421659';
+        eldritchGlow = '#c084fc';
+        typeTag = 'TACTIC (MANEUVER)';
+        sigilColor = '#e9d5ff';
+      } else if (card.cardType === 'Repair') {
+        frameColor = '#241b0b';
+        innerParchment = '#2e2516';
+        headerBg = '#54360e';
+        eldritchGlow = '#34d399';
+        typeTag = 'REPAIR (HULL)';
+        sigilColor = '#6ee7b7';
+      }
+
+      if (isPlayable) {
+        ctx.shadowColor = eldritchGlow;
+        ctx.shadowBlur = isHovered ? 18 : 8;
+      }
+
+      ctx.fillStyle = frameColor;
+      ctx.beginPath();
+      ctx.roundRect(-w / 2, -h / 2, w, h, 6);
+      ctx.fill();
+      ctx.strokeStyle = isPlayable ? eldritchGlow : '#475569';
+      ctx.lineWidth = isHovered ? 2.5 : 1.6;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      ctx.fillStyle = innerParchment;
+      ctx.beginPath();
+      ctx.roundRect(-w / 2 + 5, -h / 2 + 5, w - 10, h - 10, 4);
+      ctx.fill();
+
+      // Header Ribbon
+      ctx.fillStyle = headerBg;
+      ctx.beginPath();
+      ctx.roundRect(-w / 2 + 6, -h / 2 + 7, w - 12, 25, 3);
+      ctx.fill();
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = 'bold 10.5px "Georgia", serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(`${card.staminaCost}`, cx + 16, cy + 16);
+      ctx.fillText(card.title, 8, -h / 2 + 20, w - 34);
 
-      // Card Title
-      ctx.font = 'bold 11px "Cinzel", Georgia, serif';
-      ctx.fillStyle = canAfford ? '#fde047' : '#9ca3af';
-      ctx.textAlign = 'center';
-      ctx.fillText(card.title, cx + cardW / 2 + 6, cy + 20, cardW - 36);
+      // Stamina Cost Medallion
+      const gemX = -w / 2 + 15;
+      const gemY = -h / 2 + 15;
+      const gemR = 12.5;
+      ctx.fillStyle = '#1c1917';
+      ctx.beginPath();
+      ctx.arc(gemX, gemY, gemR, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#b45309';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
 
-      // Stat highlight banner
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
-      ctx.fillRect(cx + 6, cy + 34, cardW - 12, 22);
+      const gemGrad = ctx.createRadialGradient(gemX - 3, gemY - 3, 2, gemX, gemY, gemR - 2);
+      gemGrad.addColorStop(0, '#fef08a');
+      gemGrad.addColorStop(0.4, '#eab308');
+      gemGrad.addColorStop(1, '#78350f');
+      ctx.fillStyle = gemGrad;
+      ctx.beginPath();
+      ctx.arc(gemX, gemY, gemR - 2.5, 0, Math.PI * 2);
+      ctx.fill();
 
-      ctx.font = 'bold 10px sans-serif';
-      ctx.fillStyle = '#38bdf8';
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 13px "Georgia", serif';
+      ctx.fillText(`${card.staminaCost}`, gemX, gemY + 1);
+
+      // Artwork Socket
+      const artW = w - 16;
+      const artH = 64;
+      const artX = -artW / 2;
+      const artY = -h / 2 + 36;
+      ctx.fillStyle = '#0a0d12';
+      ctx.fillRect(artX, artY, artW, artH);
+      ctx.strokeStyle = '#292524';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(artX, artY, artW, artH);
+
       let statText = '';
       if (card.damage > 0) statText = `${card.damage} DMG`;
-      if (card.armorGain > 0) statText = `+${card.armorGain} Armor`;
-      if (card.hullRepair > 0) statText = `+${card.hullRepair} Repair`;
-      if (card.dodgeChance > 0) statText = `${Math.round(card.dodgeChance * 100)}% Dodge`;
-      if (card.stunTurns > 0) statText = `${card.damage} Dmg • Stun`;
-      ctx.fillText(statText, cx + cardW / 2, cy + 48);
+      if (card.armorGain > 0) statText = `+${card.armorGain} ARMOR`;
+      if (card.hullRepair > 0) statText = `+${card.hullRepair} REPAIR`;
+      if (card.dodgeChance > 0) statText = `${Math.round(card.dodgeChance * 100)}% DODGE`;
+      if (card.stunTurns > 0) statText = `${card.damage} DMG • STUN`;
 
-      // Description text
-      ctx.font = 'italic 9px Georgia, serif';
-      ctx.fillStyle = '#cbd5e1';
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'alphabetic';
-      this.wrapText(ctx, card.description, cx + 10, cy + 74, cardW - 20, 12);
+      ctx.fillStyle = sigilColor;
+      ctx.font = 'bold 11px "Georgia", serif';
+      ctx.fillText(statText, 0, artY + artH / 2);
+
+      // Type Tag Ribbon
+      ctx.fillStyle = card.cardType === 'Tactic' ? '#2e1065' : '#171412';
+      ctx.beginPath();
+      ctx.roundRect(-w / 2 + 10, artY + artH + 5, w - 20, 14, 2);
+      ctx.fill();
+      ctx.fillStyle = sigilColor;
+      ctx.font = 'bold 8px "Segoe UI", sans-serif';
+      ctx.fillText(typeTag, 0, artY + artH + 12);
+
+      // Description
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = '9.5px "Georgia", serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      this.wrapText(ctx, card.description, 0, artY + artH + 25, w - 20, 12);
+
+      if (!isPlayable) {
+        ctx.fillStyle = 'rgba(10, 12, 16, 0.65)';
+        ctx.beginPath();
+        ctx.roundRect(-w / 2, -h / 2, w, h, 6);
+        ctx.fill();
+      }
 
       ctx.restore();
+
+      // Shortcut Badge
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(tilt);
+      ctx.fillStyle = isPlayable ? '#38bdf8' : '#64748b';
+      ctx.beginPath();
+      ctx.arc(0, -(baseH / 2) * cardScale - 10, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 11px "Segoe UI", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`${i + 1}`, 0, -(baseH / 2) * cardScale - 10);
+      ctx.restore();
+    };
+
+    for (let i = 0; i < cardCount; i++) {
+      if (i !== this.hoveredCardIndex) {
+        renderCardAt(i);
+      }
+    }
+    if (this.hoveredCardIndex >= 0 && this.hoveredCardIndex < cardCount) {
+      renderCardAt(this.hoveredCardIndex);
     }
   }
 
@@ -790,14 +983,16 @@ export class NavalBattleEngine implements ICombatEngine {
       const testLine = line + words[n] + ' ';
       const metrics = ctx.measureText(testLine);
       if (metrics.width > maxWidth && n > 0) {
-        ctx.fillText(line, x, curY);
+        ctx.fillText(line.trim(), x, curY);
         line = words[n] + ' ';
         curY += lineHeight;
       } else {
         line = testLine;
       }
     }
-    ctx.fillText(line, x, curY);
+    if (line.trim().length > 0) {
+      ctx.fillText(line.trim(), x, curY);
+    }
   }
 
   private renderCombatLog(ctx: CanvasRenderingContext2D, _width: number, height: number): void {
