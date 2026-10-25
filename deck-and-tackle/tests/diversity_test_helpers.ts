@@ -419,7 +419,7 @@ export function referenceGenerateSalvageReward(zoneTier: ZoneTier, rollTypeFloat
       4: [60, 100]
     };
     const [minG, maxG] = ranges[zoneTier];
-    const gold = Math.floor(minG + rollSubFloat * (maxG - minG + 1));
+    const gold = Math.max(minG, Math.min(maxG, Math.floor(minG + Math.min(0.999999, rollSubFloat) * (maxG - minG + 1))));
     return {
       type: 'gold',
       amount: gold,

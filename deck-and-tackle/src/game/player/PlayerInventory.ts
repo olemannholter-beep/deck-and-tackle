@@ -1,5 +1,8 @@
 import type { CardData } from '../battle/CardData';
 import { createStarterDeck } from '../battle/CardData';
+import type { BaitId } from '../battle/BaitData';
+import type { NavalCardData } from '../battle/NavalCardData';
+import { createStarterNavalDeck } from '../battle/NavalCardData';
 
 export interface StaminaUpgradeTier {
   level: number;
@@ -84,7 +87,20 @@ export const LINE_HEALTH_UPGRADES: LineHealthUpgradeTier[] = [
 export class PlayerInventory {
   public gold: number = 25; // Starting wallet gold
   public deck: CardData[] = [];
+  public navalDeck: NavalCardData[] = [];
+  public hullHp: number = 60;
+  public maxHullHp: number = 60;
   public totalFishCaught: number = 0;
+
+  // Bait inventory tracking
+  public baits: Record<BaitId, number> = {
+    bare_hook: Infinity,
+    lugworms: 0,
+    blood_chum: 0,
+    bio_squid: 0,
+    eldritch_grub: 0
+  };
+  public selectedBait: BaitId = 'bare_hook';
 
   // Upgradable Player Stats (Base values)
   public baseMaxStamina: number = 2;
@@ -96,6 +112,7 @@ export class PlayerInventory {
 
   constructor() {
     this.deck = createStarterDeck();
+    this.navalDeck = createStarterNavalDeck();
   }
 
   public get maxStamina(): number {
@@ -170,5 +187,61 @@ export class PlayerInventory {
 
   public getDeckCopy(): CardData[] {
     return this.deck.map(c => ({ ...c }));
+  }
+
+  public addNavalCard(card: NavalCardData): void {
+    this.navalDeck.push({ ...card });
+  }
+
+  public getNavalDeckCopy(): NavalCardData[] {
+    return this.navalDeck.map(c => ({ ...c }));
+  }
+
+  public get equippedBaitId(): BaitId {
+    return this.selectedBait;
+  }
+
+  public set equippedBaitId(id: BaitId) {
+    this.selectBait(id);
+  }
+
+  public getBaitCount(id: BaitId): number {
+    if (id === 'bare_hook') return Infinity;
+    return this.baits[id] ?? 0;
+  }
+
+  public addBait(id: BaitId, count: number = 1): void {
+    if (id === 'bare_hook') return;
+    this.baits[id] = (this.baits[id] ?? 0) + count;
+  }
+
+  public consumeBait(id: BaitId): boolean {
+    if (id === 'bare_hook') {
+      return true;
+    }
+    const current = this.baits[id] ?? 0;
+    if (current > 0) {
+      this.baits[id] = current - 1;
+      if (this.baits[id] <= 0) {
+        this.baits[id] = 0;
+        if (this.selectedBait === id) {
+          this.selectedBait = 'bare_hook';
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
+  public selectBait(id: BaitId): boolean {
+    if (id === 'bare_hook') {
+      this.selectedBait = 'bare_hook';
+      return true;
+    }
+    if ((this.baits[id] ?? 0) > 0) {
+      this.selectedBait = id;
+      return true;
+    }
+    return false;
   }
 }

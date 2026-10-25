@@ -4,6 +4,9 @@ import type { StaminaUpgradeTier, LineHealthUpgradeTier } from '../player/Player
 import { SHOP_CARDS } from '../battle/CardData';
 import type { CardData } from '../battle/CardData';
 import { AudioManager } from '../../engine/AudioManager';
+import { BAIT_REGISTRY } from '../battle/BaitData';
+import type { BaitData } from '../battle/BaitData';
+import type { NavalCardData } from '../battle/NavalCardData';
 
 export class HarborShopOverlay {
   private onClose: () => void;
@@ -13,28 +16,32 @@ export class HarborShopOverlay {
   // View mode: 'shop' | 'deck_view' (strictly mutually exclusive)
   private viewMode: 'shop' | 'deck_view' = 'shop';
 
-  // Category filter tab: 'all' | 'ledgers' | 'techniques' | 'upgrades'
-  private selectedTab: 'all' | 'ledgers' | 'techniques' | 'upgrades' = 'all';
+  // Category filter tab: 'all' | 'ledgers' | 'techniques' | 'upgrades' | 'bait'
+  private selectedTab: 'all' | 'ledgers' | 'techniques' | 'upgrades' | 'bait' = 'all';
 
   // UI button hitboxes
   private returnBtnRect = { x: 24, y: 0, w: 210, h: 32 };
   private viewDeckBtnRect = { x: 0, y: 0, w: 0, h: 0 };
   private tabLedgersRect = { x: 0, y: 0, w: 0, h: 0 };
   private tabTechniquesRect = { x: 0, y: 0, w: 0, h: 0 };
+  private tabBaitRect = { x: 0, y: 0, w: 0, h: 0 };
   private tabUpgradesRect = { x: 0, y: 0, w: 0, h: 0 };
 
   // Shop cards layout & buy button hitboxes
   private buyButtons: { card: CardData; rect: { x: number; y: number; w: number; h: number } }[] = [];
   private staminaUpgradeButtons: { tier: StaminaUpgradeTier; rect: { x: number; y: number; w: number; h: number } }[] = [];
   private lineUpgradeButtons: { tier: LineHealthUpgradeTier; rect: { x: number; y: number; w: number; h: number } }[] = [];
+  private baitBuyButtons: { bait: BaitData; rect: { x: number; y: number; w: number; h: number } }[] = [];
 
   private hoveredBuyIndex: number = -1;
   private hoveredStaminaIndex: number = -1;
   private hoveredLineIndex: number = -1;
+  private hoveredBaitBuyIndex: number = -1;
   private isReturnHovered: boolean = false;
   private isViewDeckHovered: boolean = false;
   private isTabLedgersHovered: boolean = false;
   private isTabTechniquesHovered: boolean = false;
+  private isTabBaitHovered: boolean = false;
   private isTabUpgradesHovered: boolean = false;
 
   // Tooltip & feedback notification
@@ -75,11 +82,34 @@ export class HarborShopOverlay {
       const img = new Image();
       img.src = `/assets/sprites/shop/${name}`;
       this.images.set(name, img);
+      this.images.set(`/assets/sprites/shop/${name}`, img);
+    }
+
+    const fishingSprites = [
+      'tackle_hook_bone.png',
+      'tackle_lure_shrimp.png',
+      'tackle_lure_snail.png'
+    ];
+    for (const name of fishingSprites) {
+      const img = new Image();
+      img.src = `/assets/sprites/fishing/${name}`;
+      this.images.set(name, img);
+      this.images.set(`/assets/sprites/fishing/${name}`, img);
     }
   }
 
   private static getImage(name: string): HTMLImageElement | undefined {
-    return this.images.get(name);
+    if (this.images.has(name)) {
+      return this.images.get(name);
+    }
+    const filename = name.split('/').pop();
+    if (filename && this.images.has(filename)) {
+      return this.images.get(filename);
+    }
+    const img = new Image();
+    img.src = name.startsWith('/') ? name : `/assets/sprites/shop/${name}`;
+    this.images.set(name, img);
+    return img;
   }
 
   public update(dt: number, width: number, height: number): void {
@@ -133,6 +163,18 @@ export class HarborShopOverlay {
       return;
     }
 
+    if (Input.isJustPressed('keyb')) {
+      this.selectedTab = this.selectedTab === 'bait' ? 'all' : 'bait';
+      AudioManager.getInstance().playButtonClick();
+      this.showNotification(
+        this.selectedTab === 'bait'
+          ? 'Viewing Chandlery Bait & Chum Offerings'
+          : 'Showing All Chandlery Items',
+        '#f59e0b'
+      );
+      return;
+    }
+
     const mousePos = Input.getMousePosition();
     const leftW = Math.floor(width * 0.48);
     const divW = 8;
@@ -152,6 +194,8 @@ export class HarborShopOverlay {
       mousePos.y <= this.returnBtnRect.y + this.returnBtnRect.h;
 
     if (this.isReturnHovered && Input.isMouseClicked()) {
+      this.hoveredCard = null;
+      this.viewMode = 'shop';
       AudioManager.getInstance().playButtonClick();
       this.onClose();
       return;
@@ -183,7 +227,7 @@ export class HarborShopOverlay {
     // Tab 1: Ledgers
     this.tabLedgersRect.x = headerX + Math.floor(headerW * (408 / 1300));
     this.tabLedgersRect.y = headerY + Math.floor(headerH * (89 / 151));
-    this.tabLedgersRect.w = Math.floor(headerW * (158 / 1300));
+    this.tabLedgersRect.w = Math.floor(headerW * (123 / 1300));
     this.tabLedgersRect.h = headerH - Math.floor(headerH * (89 / 151)) - 5;
 
     this.isTabLedgersHovered =
@@ -203,9 +247,9 @@ export class HarborShopOverlay {
     }
 
     // Tab 2: Techniques
-    this.tabTechniquesRect.x = headerX + Math.floor(headerW * (576 / 1300));
+    this.tabTechniquesRect.x = headerX + Math.floor(headerW * (535 / 1300));
     this.tabTechniquesRect.y = headerY + Math.floor(headerH * (89 / 151));
-    this.tabTechniquesRect.w = Math.floor(headerW * (168 / 1300));
+    this.tabTechniquesRect.w = Math.floor(headerW * (123 / 1300));
     this.tabTechniquesRect.h = headerH - Math.floor(headerH * (89 / 151)) - 5;
 
     this.isTabTechniquesHovered =
@@ -224,10 +268,32 @@ export class HarborShopOverlay {
       return;
     }
 
-    // Tab 3: Upgrades (Stamina & Line Health)
-    this.tabUpgradesRect.x = headerX + Math.floor(headerW * (754 / 1300));
+    // Tab 3: Bait & Chum
+    this.tabBaitRect.x = headerX + Math.floor(headerW * (662 / 1300));
+    this.tabBaitRect.y = headerY + Math.floor(headerH * (89 / 151));
+    this.tabBaitRect.w = Math.floor(headerW * (123 / 1300));
+    this.tabBaitRect.h = headerH - Math.floor(headerH * (89 / 151)) - 5;
+
+    this.isTabBaitHovered =
+      mousePos.x >= this.tabBaitRect.x &&
+      mousePos.x <= this.tabBaitRect.x + this.tabBaitRect.w &&
+      mousePos.y >= this.tabBaitRect.y &&
+      mousePos.y <= this.tabBaitRect.y + this.tabBaitRect.h;
+
+    if (this.isTabBaitHovered && Input.isMouseClicked()) {
+      AudioManager.getInstance().playButtonClick();
+      this.selectedTab = this.selectedTab === 'bait' ? 'all' : 'bait';
+      this.showNotification(
+        this.selectedTab === 'bait' ? 'Viewing Chandlery Bait & Chum Offerings' : 'Showing All Chandlery Items',
+        '#f59e0b'
+      );
+      return;
+    }
+
+    // Tab 4: Upgrades (Stamina & Line Health)
+    this.tabUpgradesRect.x = headerX + Math.floor(headerW * (789 / 1300));
     this.tabUpgradesRect.y = headerY + Math.floor(headerH * (89 / 151));
-    this.tabUpgradesRect.w = Math.floor(headerW * (160 / 1300));
+    this.tabUpgradesRect.w = Math.floor(headerW * (123 / 1300));
     this.tabUpgradesRect.h = headerH - Math.floor(headerH * (89 / 151)) - 5;
 
     this.isTabUpgradesHovered =
@@ -330,6 +396,47 @@ export class HarborShopOverlay {
           }
           return;
         }
+      } else if (this.selectedTab === 'bait') {
+        // Bait Buy Buttons
+        this.hoveredBaitBuyIndex = -1;
+        for (let i = 0; i < this.baitBuyButtons.length; i++) {
+          const item = this.baitBuyButtons[i];
+          const btn = item.rect;
+          if (
+            mousePos.x >= btn.x &&
+            mousePos.x <= btn.x + btn.w &&
+            mousePos.y >= btn.y &&
+            mousePos.y <= btn.y + btn.h
+          ) {
+            this.hoveredBaitBuyIndex = i;
+            break;
+          }
+        }
+
+        if (this.hoveredBaitBuyIndex !== -1 && Input.isMouseClicked()) {
+          const baitToBuy = this.baitBuyButtons[this.hoveredBaitBuyIndex].bait;
+          if (baitToBuy.id === 'bare_hook') {
+            AudioManager.getInstance().playButtonClick();
+            this.showNotification('Bare Hook is permanent and always in stock aboard your vessel!', '#94a3b8');
+            return;
+          }
+
+          if (this.inventory.spendGold(baitToBuy.cost)) {
+            this.inventory.addBait(baitToBuy.id, 1);
+            AudioManager.getInstance().playGoldCoins();
+            this.showNotification(
+              `Acquired ${baitToBuy.name}! In Hold: ${this.inventory.getBaitCount(baitToBuy.id)}.`,
+              '#34d399'
+            );
+          } else {
+            AudioManager.getInstance().playButtonClick();
+            this.showNotification(
+              `Insufficient sovereigns! Need ${baitToBuy.cost}g (You hold ${this.inventory.gold}g).`,
+              '#f87171'
+            );
+          }
+          return;
+        }
       } else {
         // Standard Card Buy Buttons (Ledgers & Techniques)
         this.hoveredBuyIndex = -1;
@@ -382,8 +489,14 @@ export class HarborShopOverlay {
       this.isViewDeckHovered ||
       this.isTabLedgersHovered ||
       this.isTabTechniquesHovered ||
+      this.isTabBaitHovered ||
       this.isTabUpgradesHovered ||
-      (this.viewMode === 'shop' && (this.hoveredBuyIndex !== -1 || this.hoveredStaminaIndex !== -1 || this.hoveredLineIndex !== -1));
+      (this.viewMode === 'shop' && (
+        this.hoveredBuyIndex !== -1 ||
+        this.hoveredStaminaIndex !== -1 ||
+        this.hoveredLineIndex !== -1 ||
+        this.hoveredBaitBuyIndex !== -1
+      ));
 
     Input.setCursor(isInteractive ? 'pointer' : 'default');
   }
@@ -581,6 +694,7 @@ export class HarborShopOverlay {
     this.buyButtons = [];
     this.staminaUpgradeButtons = [];
     this.lineUpgradeButtons = [];
+    this.baitBuyButtons = [];
     this.hoveredCard = null;
 
     // 1. Header Bar Banner
@@ -642,7 +756,7 @@ export class HarborShopOverlay {
     ctx.lineWidth = isLedgersActive ? 2.0 : 1.2;
     ctx.stroke();
 
-    ctx.font = `bold ${Math.max(8, Math.round(this.tabLedgersRect.h * 0.44))}px "Cinzel", serif`;
+    ctx.font = `bold ${Math.max(7.5, Math.round(this.tabLedgersRect.h * 0.38))}px "Cinzel", serif`;
     ctx.fillStyle = isLedgersActive ? '#fef08a' : (this.isTabLedgersHovered ? '#fde68a' : '#d6c7b2');
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -672,7 +786,7 @@ export class HarborShopOverlay {
     ctx.lineWidth = isTechniquesActive ? 2.0 : 1.2;
     ctx.stroke();
 
-    ctx.font = `bold ${Math.max(8, Math.round(this.tabTechniquesRect.h * 0.44))}px "Cinzel", serif`;
+    ctx.font = `bold ${Math.max(7.5, Math.round(this.tabTechniquesRect.h * 0.38))}px "Cinzel", serif`;
     ctx.fillStyle = isTechniquesActive ? '#f3e8ff' : (this.isTabTechniquesHovered ? '#e9d5ff' : '#d6c7b2');
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -683,7 +797,37 @@ export class HarborShopOverlay {
     );
     ctx.restore();
 
-    // --- TAB 3: UPGRADES (STAMINA & LINE HEALTH) ---
+    // --- TAB 3: BAIT & CHUM ---
+    const isBaitActive = this.selectedTab === 'bait';
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(
+      this.tabBaitRect.x,
+      this.tabBaitRect.y,
+      this.tabBaitRect.w,
+      this.tabBaitRect.h,
+      4
+    );
+    ctx.fillStyle = isBaitActive
+      ? '#451a03'
+      : (this.isTabBaitHovered ? '#2e1809' : '#1c130d');
+    ctx.fill();
+    ctx.strokeStyle = isBaitActive ? '#f59e0b' : (this.isTabBaitHovered ? '#fbbf24' : '#573d2a');
+    ctx.lineWidth = isBaitActive ? 2.0 : 1.2;
+    ctx.stroke();
+
+    ctx.font = `bold ${Math.max(7.5, Math.round(this.tabBaitRect.h * 0.38))}px "Cinzel", serif`;
+    ctx.fillStyle = isBaitActive ? '#fef08a' : (this.isTabBaitHovered ? '#fde68a' : '#d6c7b2');
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(
+      '🪱 BAIT & CHUM',
+      this.tabBaitRect.x + this.tabBaitRect.w / 2,
+      this.tabBaitRect.y + this.tabBaitRect.h / 2
+    );
+    ctx.restore();
+
+    // --- TAB 4: UPGRADES (STAMINA & LINE HEALTH) ---
     const isUpgradesActive = this.selectedTab === 'upgrades';
     ctx.save();
     ctx.beginPath();
@@ -702,7 +846,7 @@ export class HarborShopOverlay {
     ctx.lineWidth = isUpgradesActive ? 2.0 : 1.2;
     ctx.stroke();
 
-    ctx.font = `bold ${Math.max(8, Math.round(this.tabUpgradesRect.h * 0.44))}px "Cinzel", serif`;
+    ctx.font = `bold ${Math.max(7.5, Math.round(this.tabUpgradesRect.h * 0.38))}px "Cinzel", serif`;
     ctx.fillStyle = isUpgradesActive ? '#a7f3d0' : (this.isTabUpgradesHovered ? '#6ee7b7' : '#d6c7b2');
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -758,10 +902,12 @@ export class HarborShopOverlay {
       ctx.fillRect(bookX, bookY, bookW, bookH);
     }
 
-    // 3. Mutually Exclusive Content Views (Deck inspection, Shop catalogue, or Upgrades catalogue)
+    // 3. Mutually Exclusive Content Views (Deck inspection, Shop catalogue, Upgrades catalogue, or Bait catalogue)
     if (this.viewMode === 'shop') {
       if (this.selectedTab === 'upgrades') {
         this.renderUpgradesCatalogue(ctx, bookX, bookY, bookW, bookH);
+      } else if (this.selectedTab === 'bait') {
+        this.renderBaitCatalogue(ctx, bookX, bookY, bookW, bookH);
       } else {
         this.renderShopCatalogue(ctx, bookX, bookY, bookW, bookH);
       }
@@ -1470,6 +1616,269 @@ export class HarborShopOverlay {
   }
 
   // ==========================================
+  // BAIT & CHUM CATALOGUE
+  // ==========================================
+  private renderBaitCatalogue(
+    ctx: CanvasRenderingContext2D,
+    bx: number,
+    by: number,
+    bw: number,
+    bh: number
+  ): void {
+    const pageMarginTop = 46;
+    const pageWidth = (bw - 64) / 2;
+    const leftPageX = bx + 34;
+    const rightPageX = bx + pageWidth + 30;
+    const startY = by + pageMarginTop;
+    const cardW = pageWidth - 14;
+
+    const mousePos = Input.getMousePosition();
+
+    // ==========================================
+    // LEFT PAGE: INNSMOUTH CHANDLERY BAIT & CHUM
+    // ==========================================
+    ctx.save();
+    ctx.font = 'bold 12px "Cinzel", serif';
+    ctx.fillStyle = '#78350f';
+    ctx.textAlign = 'center';
+    ctx.fillText('✦ INNSMOUTH CHANDLERY BAIT & CHUM ✦', leftPageX + pageWidth / 2, startY - 14);
+
+    ctx.font = 'italic 9.5px Georgia, serif';
+    ctx.fillStyle = '#574635';
+    ctx.fillText('Entice coastal shoals, bottom-dwellers & pelagic predators', leftPageX + pageWidth / 2, startY);
+
+    // Left Page Baits: Bare Hook, Lugworms, Blood Chum
+    const leftBaits: BaitData[] = [
+      BAIT_REGISTRY.bare_hook,
+      BAIT_REGISTRY.lugworms,
+      BAIT_REGISTRY.blood_chum
+    ];
+
+    const cardH = 68;
+    const cardGap = 12;
+    const cardsStartY = startY + 12;
+
+    leftBaits.forEach((bait, idx) => {
+      const cy = cardsStartY + idx * (cardH + cardGap);
+      this.renderBaitCard(ctx, bait, leftPageX, cy, cardW, cardH, mousePos);
+    });
+
+    ctx.restore();
+
+    // ==========================================
+    // RIGHT PAGE: ABYSSAL LURES & APEX OFFERINGS
+    // ==========================================
+    ctx.save();
+    ctx.font = 'bold 12px "Cinzel", serif';
+    ctx.fillStyle = '#581c87';
+    ctx.textAlign = 'center';
+    ctx.fillText('✦ ABYSSAL LURES & APEX OFFERINGS ✦', rightPageX + pageWidth / 2, startY - 14);
+
+    ctx.font = 'italic 9.5px Georgia, serif';
+    ctx.fillStyle = '#574635';
+    ctx.fillText('Harvested from lightless hydrothermal vents & trench voids', rightPageX + pageWidth / 2, startY);
+
+    // Right Page Baits: Bioluminescent Squid, Eldritch Grub
+    const rightBaits: BaitData[] = [
+      BAIT_REGISTRY.bio_squid,
+      BAIT_REGISTRY.eldritch_grub
+    ];
+
+    rightBaits.forEach((bait, idx) => {
+      const cy = cardsStartY + idx * (cardH + cardGap);
+      this.renderBaitCard(ctx, bait, rightPageX, cy, cardW, cardH, mousePos);
+    });
+
+    // Right Page Bottom: Tackle Codex / Lore Plaque
+    const codexY = cardsStartY + 2 * (cardH + cardGap) + 4;
+    const codexH = bh - (codexY - by) - 24;
+    if (codexH > 40) {
+      ctx.beginPath();
+      ctx.roundRect(rightPageX, codexY, cardW, codexH, 5);
+      ctx.fillStyle = 'rgba(88, 28, 135, 0.06)';
+      ctx.strokeStyle = '#9333ea';
+      ctx.lineWidth = 1.2;
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.font = 'bold 10px "Cinzel", serif';
+      ctx.fillStyle = '#6b21a8';
+      ctx.textAlign = 'left';
+      ctx.fillText('✦ CHANDLERY TACKLE CODEX ✦', rightPageX + 12, codexY + 18);
+
+      ctx.font = 'italic 8px Georgia, serif';
+      ctx.fillStyle = '#44382c';
+      ctx.fillText(
+        '• Baits bias fish encounters toward Rare & Aberrant apex specimens.',
+        rightPageX + 12,
+        codexY + 34
+      );
+      ctx.fillText(
+        '• High-grade bait increases bite strike rate (up to 85%) and lowers slack line.',
+        rightPageX + 12,
+        codexY + 48
+      );
+      ctx.fillText(
+        '• Bare Hook is always available without cost. Rig your tackle prior to every cast.',
+        rightPageX + 12,
+        codexY + 62
+      );
+    }
+
+    ctx.restore();
+  }
+
+  private renderBaitCard(
+    ctx: CanvasRenderingContext2D,
+    bait: BaitData,
+    cx: number,
+    cy: number,
+    cw: number,
+    ch: number,
+    mousePos: { x: number; y: number }
+  ): void {
+    const isBareHook = bait.id === 'bare_hook';
+    const count = this.inventory.getBaitCount(bait.id);
+    const canAfford = this.inventory.gold >= bait.cost;
+
+    // Card plate
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(cx, cy, cw, ch, 4);
+    ctx.clip();
+
+    // Parchment card fill
+    ctx.fillStyle = '#f5ede0';
+    ctx.fill();
+    ctx.strokeStyle = isBareHook ? '#78716c' : '#b45309';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    // 1. Icon Box
+    const iconSize = 42;
+    const iconX = cx + 8;
+    const iconY = cy + Math.floor((ch - iconSize) / 2);
+
+    ctx.beginPath();
+    ctx.roundRect(iconX, iconY, iconSize, iconSize, 4);
+    ctx.fillStyle = '#1e1b18';
+    ctx.fill();
+    ctx.strokeStyle = '#785b3b';
+    ctx.lineWidth = 1.0;
+    ctx.stroke();
+
+    const img = HarborShopOverlay.getImage(bait.iconAssetKey);
+    if (img && img.complete && img.naturalWidth > 0) {
+      ctx.drawImage(img, iconX + 2, iconY + 2, iconSize - 4, iconSize - 4);
+    } else {
+      // Fallback symbol
+      ctx.font = 'bold 16px sans-serif';
+      ctx.fillStyle = '#f59e0b';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🪱', iconX + iconSize / 2, iconY + iconSize / 2);
+    }
+
+    // 2. Buy / Status Button on Right
+    const btnW = 74;
+    const btnH = 26;
+    const btnX = cx + cw - btnW - 8;
+    const btnY = cy + Math.floor((ch - btnH) / 2);
+
+    const isBtnHovered =
+      mousePos.x >= btnX &&
+      mousePos.x <= btnX + btnW &&
+      mousePos.y >= btnY &&
+      mousePos.y <= btnY + btnH;
+
+    ctx.beginPath();
+    ctx.roundRect(btnX, btnY, btnW, btnH, 3);
+
+    if (isBareHook) {
+      ctx.fillStyle = '#292524';
+      ctx.fill();
+      ctx.strokeStyle = '#78716c';
+      ctx.lineWidth = 1.0;
+      ctx.stroke();
+
+      ctx.font = 'bold 8.5px "Cinzel", serif';
+      ctx.fillStyle = '#cbd5e1';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('READY (∞)', btnX + btnW / 2, btnY + btnH / 2);
+    } else {
+      if (canAfford) {
+        ctx.fillStyle = isBtnHovered ? '#92400e' : '#451a03';
+        ctx.strokeStyle = isBtnHovered ? '#f59e0b' : '#b45309';
+      } else {
+        ctx.fillStyle = '#3f3f46';
+        ctx.strokeStyle = '#71717a';
+      }
+      ctx.fill();
+      ctx.lineWidth = 1.0;
+      ctx.stroke();
+
+      ctx.font = 'bold 8.5px "Cinzel", serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      if (canAfford) {
+        ctx.fillStyle = isBtnHovered ? '#ffffff' : '#fef08a';
+        ctx.fillText(`BUY ${bait.cost}g`, btnX + btnW / 2, btnY + btnH / 2);
+      } else {
+        ctx.fillStyle = '#fca5a5';
+        ctx.fillText(`${bait.cost}g (LACK)`, btnX + btnW / 2, btnY + btnH / 2);
+      }
+    }
+
+    this.baitBuyButtons.push({
+      bait,
+      rect: { x: btnX, y: btnY, w: btnW, h: btnH }
+    });
+
+    // 3. Content Typography Area
+    const textX = iconX + iconSize + 8;
+    const maxTextW = btnX - textX - 6;
+
+    // Line 1: Title + Owned in Hold Badge
+    const titleY = cy + 15;
+    ctx.font = 'bold 10.5px "Cinzel", serif';
+    ctx.fillStyle = '#1e1b18';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(bait.name, textX, titleY, maxTextW - 65);
+
+    // Owned Stock Badge
+    ctx.save();
+    const holdBadgeText = isBareHook ? 'In Hold: ∞' : `In Hold: ${count}`;
+    ctx.font = 'bold 8.5px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillStyle = count > 0 || isBareHook ? '#047857' : '#94a3b8';
+    ctx.fillText(holdBadgeText, btnX - 6, titleY);
+    ctx.restore();
+
+    // Line 2: Attraction Stat Tags (+Common / +Uncommon / +Rare)
+    const statY = titleY + 14;
+    ctx.font = 'bold 8px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+
+    const rw = bait.rarityWeights;
+    const statTagText = `Attracts: ${rw.common}% Common • ${rw.uncommon}% Uncom • ${rw.rare}% Rare`;
+    ctx.fillStyle = '#0369a1';
+    ctx.fillText(statTagText, textX, statY, maxTextW);
+
+    // Line 3: Description Lore
+    const descY = statY + 13;
+    ctx.font = 'italic 7.5px "Crimson Pro", Georgia, serif';
+    ctx.fillStyle = '#44382c';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(bait.description, textX, descY, maxTextW);
+
+    ctx.restore();
+  }
+
+  // ==========================================
   // DECK INSPECTION VIEW (ONLY RENDERED IN DECK VIEW MODE)
   // ==========================================
   private renderDeckInspection(
@@ -1572,28 +1981,21 @@ export class HarborShopOverlay {
       ctx.restore();
     }
 
-    // RIGHT PAGE: INSCRIBED RELIC TECHNIQUES
+    // RIGHT PAGE: NAVAL ARMORY DECK (Cards for naval/monster combat)
     if (showRight) {
       ctx.font = 'bold 12px "Cinzel", serif';
       ctx.fillStyle = '#1e1b18';
       ctx.textAlign = 'center';
-      ctx.fillText('INSCRIBED RELIC TECHNIQUES', rightPageX + pageWidth / 2, startY - 14);
+      ctx.fillText('NAVAL ARMORY DECK', rightPageX + pageWidth / 2, startY - 14);
 
       ctx.font = 'italic 9.5px Georgia, serif';
       ctx.fillStyle = '#574635';
-      ctx.fillText('Ancient mythos techniques acquired from the Chandlery', rightPageX + pageWidth / 2, startY);
+      ctx.fillText('Fitted broadsides, ordnance & maneuvers for warship & beast combat', rightPageX + pageWidth / 2, startY);
 
-      // Collect all unique technique cards in deck
-      const techniqueCards: CardData[] = [];
-      for (const c of this.inventory.deck) {
-        if (c.cardType === 'Technique' || !!c.oncePerBattle) {
-          if (!techniqueCards.some(tc => tc.id === c.id)) {
-            techniqueCards.push(c);
-          }
-        }
-      }
+      const navalCards = this.inventory.navalDeck || [];
+      const hasCards = navalCards.length > 0;
 
-      if (techniqueCards.length === 0) {
+      if (!hasCards) {
         ctx.save();
         ctx.fillStyle = 'rgba(74, 53, 37, 0.08)';
         ctx.strokeStyle = '#a8947c';
@@ -1607,79 +2009,84 @@ export class HarborShopOverlay {
         ctx.fillStyle = '#78350f';
         ctx.textAlign = 'center';
         ctx.fillText(
-          'NO ADVANCED TECHNIQUES INSCRIBED',
+          'No Armory Cards Fitted',
           rightPageX + cardW / 2,
           startY + usableH / 2 - 10
         );
         ctx.font = 'italic 11px Georgia, serif';
         ctx.fillStyle = '#574635';
         ctx.fillText(
-          'Return to the shop catalogue and purchase relics',
+          'Fit cannons, bracing, or tactical naval armory cards',
           rightPageX + cardW / 2,
           startY + usableH / 2 + 12
         );
         ctx.fillText(
-          'to etch them permanently into your ledger.',
+          'to prepare your vessel for hostile broadside encounters.',
           rightPageX + cardW / 2,
           startY + usableH / 2 + 28
         );
         ctx.restore();
       } else {
-        techniqueCards.forEach((c, idx) => {
-          const count = this.inventory.deck.filter(card => card.id === c.id).length;
+        // Collect unique naval cards for clean pagination
+        const uniqueNavalCards: NavalCardData[] = [];
+        for (const nc of navalCards) {
+          if (!uniqueNavalCards.some(u => u.id === nc.id)) {
+            uniqueNavalCards.push(nc);
+          }
+        }
+
+        uniqueNavalCards.forEach((c, idx) => {
+          const count = navalCards.filter(card => card.id === c.id).length;
           const cy = startY + 14 + idx * (cardH + cardGap);
-          if (cy + cardH <= by + bh - 20) {
+          if (cy + cardH <= by + bh - 24) {
             ctx.save();
             ctx.beginPath();
             ctx.roundRect(rightPageX, cy, cardW, cardH, 4);
             ctx.clip();
 
-            ctx.fillStyle = '#f3e8ff';
-            ctx.strokeStyle = '#7c3aed';
-            ctx.lineWidth = 1.3;
+            ctx.fillStyle = '#f0fdf4';
+            ctx.strokeStyle = '#0284c7';
+            ctx.lineWidth = 1.2;
             ctx.fill();
             ctx.stroke();
 
-            if (c.iconSprite) {
-              const iconImg = HarborShopOverlay.getImage(c.iconSprite);
-              if (iconImg && iconImg.complete && iconImg.naturalWidth > 0) {
-                ctx.drawImage(iconImg, rightPageX + 6, cy + (cardH - 34) / 2, 34, 34);
-              }
-            } else {
-              // Occult sigil placeholder
-              ctx.fillStyle = '#4c1d95';
-              ctx.beginPath();
-              ctx.roundRect(rightPageX + 6, cy + (cardH - 34) / 2, 34, 34, 4);
-              ctx.fill();
-              ctx.fillStyle = '#c084fc';
-              ctx.font = 'bold 13px "Segoe UI", sans-serif';
-              ctx.textAlign = 'center';
-              ctx.textBaseline = 'middle';
-              ctx.fillText('★', rightPageX + 23, cy + cardH / 2);
-            }
+            // Stamina Medallion
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.arc(rightPageX + 16, cy + cardH / 2, 7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = 'bold 8.5px "Cinzel", serif';
+            ctx.fillStyle = '#38bdf8';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const romanCost =
+              c.staminaCost === 0 ? '0' : c.staminaCost === 1 ? 'I' : c.staminaCost === 2 ? 'II' : 'III';
+            ctx.fillText(romanCost, rightPageX + 16, cy + cardH / 2);
 
+            // Title with count
             ctx.font = 'bold 10px "Cinzel", serif';
-            ctx.fillStyle = '#1e1b18';
+            ctx.fillStyle = '#0f172a';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'alphabetic';
             const countSuffix = count > 1 ? ` (x${count})` : '';
-            ctx.fillText(`${c.title}${countSuffix}`, rightPageX + 44, cy + 15, cardW - 50);
+            ctx.fillText(`${c.title}${countSuffix}`, rightPageX + 30, cy + 15, cardW - 38);
 
-            // Once per fight & backlash
-            const selfDmg = c.tensionSelf ?? c.effect?.tensionSelf ?? 0;
+            // Stat Summary (Damage / Armor / Repair / Dodge / Stun)
+            let statSummary = '';
+            if (c.damage > 0 && c.stunTurns > 0) statSummary = `${c.damage} DMG • 1 TURN STUN`;
+            else if (c.damage > 0) statSummary = `${c.damage} CANNON DAMAGE`;
+            else if (c.armorGain > 0) statSummary = `+${c.armorGain} TEMPORARY ARMOR`;
+            else if (c.hullRepair > 0) statSummary = `+${c.hullRepair} HULL REPAIR`;
+            else if (c.dodgeChance > 0) statSummary = `${Math.round(c.dodgeChance * 100)}% EVASIVE DODGE`;
+
             ctx.font = 'bold 8px "Segoe UI", sans-serif';
-            ctx.fillStyle = '#7c3aed';
-            ctx.fillText(
-              `★ ONCE PER FIGHT • -${selfDmg} LINE`,
-              rightPageX + 44,
-              cy + 26,
-              cardW - 50
-            );
+            ctx.fillStyle = '#0369a1';
+            ctx.fillText(statSummary, rightPageX + 30, cy + 27, cardW - 38);
 
-            // Lore / Effect Description
+            // Description Lore
             ctx.font = 'italic 7.5px "Crimson Pro", Georgia, serif';
-            ctx.fillStyle = '#44382c';
-            ctx.fillText(c.shortDesc ?? c.description, rightPageX + 44, cy + 38, cardW - 50);
+            ctx.fillStyle = '#334155';
+            ctx.fillText(c.description, rightPageX + 30, cy + 39, cardW - 38);
 
             ctx.restore();
           }
@@ -1691,7 +2098,7 @@ export class HarborShopOverlay {
       ctx.fillStyle = 'rgba(74, 53, 37, 0.45)';
       ctx.textAlign = 'center';
       ctx.fillText(
-        '• Inscribed Relics (Click Techniques Tab) •',
+        '• Naval Armory Deck (Click Techniques Tab) •',
         rightPageX + cardW / 2,
         startY + usableH / 2
       );
@@ -1716,7 +2123,7 @@ export class HarborShopOverlay {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(
-      `⚓ VESSEL CAPACITIES: MAX STAMINA: ${this.inventory.maxStamina} ⚡  •  MAX LINE: ${this.inventory.maxLineIntegrity} HP  •  ACTIVE DECK: ${this.inventory.deck.length} CARDS`,
+      `⚓ TACKLE DECK: ${this.inventory.deck.length} CARDS  •  NAVAL ARMORY: ${this.inventory.navalDeck.length} CARDS  •  HULL: ${this.inventory.hullHp}/${this.inventory.maxHullHp} HP`,
       statusBannerX + statusBannerW / 2,
       statusBannerY + 11
     );

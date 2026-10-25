@@ -51,6 +51,16 @@ export class HUD {
   public static calculateCompassBearing = calculateCompassBearing;
   public static formatMetricDistance = formatMetricDistance;
 
+  public static isHullCritical(hullHp: number, maxHullHp: number = 60): boolean {
+    if (maxHullHp <= 0) return false;
+    return (hullHp / maxHullHp) < 0.30;
+  }
+
+  public static calculateToll(gold: number): number {
+    if (gold <= 0) return 0;
+    return Math.max(1, Math.floor(gold * 0.18));
+  }
+
   private time: number = 0;
   public onToggleChart?: () => void;
 
@@ -86,7 +96,9 @@ export class HUD {
     nearbySpot: FishingSpot | null,
     isNearDock: boolean,
     playerGold: number = 25,
-    playerDeckCount: number = 7
+    playerDeckCount: number = 7,
+    hullHp: number = 60,
+    maxHullHp: number = 60
   ): void {
     ctx.save();
 
@@ -189,6 +201,9 @@ export class HUD {
     ctx.moveTo(dialX, dialY);
     ctx.lineTo(needleEndX, needleEndY);
     ctx.stroke();
+
+    // 4b. Live Hull HP Integrity Gauge (Above Vessel Telemetry)
+    this.renderHullGauge(ctx, 20, height - 165, 190, 65, hullHp, maxHullHp);
 
     // 5. Floating Context Interaction Prompt (Center Bottom)
     if (nearbySpot) {
@@ -545,6 +560,79 @@ export class HUD {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('🗺️ SEA CHART [M]', cx, this.chartButtonBounds.y + this.chartButtonBounds.h / 2);
+
+    ctx.restore();
+  }
+
+  public renderHullGauge(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    hullHp: number,
+    maxHullHp: number = 60
+  ): void {
+    ctx.save();
+    const safeMax = maxHullHp > 0 ? maxHullHp : 60;
+    const ratio = Math.max(0, Math.min(1.0, hullHp / safeMax));
+    const isCritical = HUD.isHullCritical(hullHp, safeMax);
+    const pulse = 0.5 + 0.5 * Math.sin(this.time * 8);
+
+    // Plate background
+    ctx.fillStyle = 'rgba(10, 25, 40, 0.85)';
+    ctx.strokeStyle = isCritical ? `rgba(239, 68, 68, ${0.5 + pulse * 0.5})` : '#457b9d';
+    ctx.lineWidth = isCritical ? 2.0 : 1.5;
+    ctx.beginPath();
+    this.drawRoundRect(ctx, x, y, w, h, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    // Title & Numerical text
+    ctx.font = 'bold 11px "Segoe UI", sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = isCritical ? '#f87171' : '#a8dadc';
+    ctx.fillText('HULL INTEGRITY', x + 14, y + 10);
+
+    ctx.font = 'bold 13px "Segoe UI", monospace';
+    ctx.textAlign = 'right';
+    ctx.fillStyle = isCritical ? '#ef4444' : '#ffffff';
+    ctx.fillText(`${hullHp} / ${safeMax} HP`, x + w - 14, y + 9);
+
+    // Integrity Bar
+    const barX = x + 14;
+    const barY = y + 28;
+    const barW = w - 28;
+    const barH = 7;
+
+    // Track
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.fillRect(barX, barY, barW, barH);
+
+    // Fill
+    const fillW = Math.max(0, Math.min(barW, Math.round(barW * ratio)));
+    let barColor = '#22c55e'; // Green
+    if (ratio < 0.30) {
+      barColor = '#ef4444'; // Red
+    } else if (ratio < 0.60) {
+      barColor = '#eab308'; // Amber
+    }
+    ctx.fillStyle = barColor;
+    ctx.fillRect(barX, barY, fillW, barH);
+
+    // Subtext / Critical Indicator
+    if (isCritical) {
+      ctx.textAlign = 'center';
+      ctx.font = 'bold 10px "Segoe UI", sans-serif';
+      ctx.fillStyle = `rgba(239, 68, 68, ${0.7 + pulse * 0.3})`;
+      ctx.fillText('⚠️ CRITICAL HULL DAMAGE', x + w / 2, y + 42);
+    } else {
+      ctx.textAlign = 'left';
+      ctx.font = '9px "Segoe UI", sans-serif';
+      ctx.fillStyle = '#64748b';
+      ctx.fillText('Reinforced Oak Bulkhead', x + 14, y + 43);
+    }
 
     ctx.restore();
   }
