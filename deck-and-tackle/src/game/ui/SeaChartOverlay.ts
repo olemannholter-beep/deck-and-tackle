@@ -261,7 +261,8 @@ export class SeaChartOverlay {
     boatHeading: number,
     activeWhirlpools: FishingSpot[],
     harborPos: Vector2 = SeaChartOverlay.HARBOR_CENTER,
-    islandColliders: IslandCollider[] = []
+    islandColliders: IslandCollider[] = [],
+    hostiles: Array<{ name: string; category: string; position: { x: number; y: number } }> = []
   ): void {
     if (!this.open) return;
 
@@ -324,6 +325,11 @@ export class SeaChartOverlay {
     // 7. Active Ephemeral Whirlpools with dynamic vortex spirals
     this.hoveredSpot = null;
     this.renderWhirlpools(ctx, width, height, activeWhirlpools);
+
+    // 7b. Roaming Hostiles (Patrol Vessels & Ambush Beasts)
+    if (hostiles && hostiles.length > 0) {
+      this.renderHostiles(ctx, width, height, hostiles);
+    }
 
     // 8. Player Vessel Marker with directional arrow and sonar radar ripple
     this.renderVessel(ctx, width, height, boatPos, boatHeading);
@@ -666,6 +672,47 @@ export class SeaChartOverlay {
         ctx.arc(0, 0, 16, 0, Math.PI * 2);
         ctx.stroke();
       }
+
+      ctx.restore();
+    }
+
+    ctx.restore();
+  }
+
+  private renderHostiles(
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    hostiles: Array<{ name: string; category: string; position: { x: number; y: number } }>
+  ): void {
+    ctx.save();
+    const pulse = 0.5 + 0.5 * Math.sin(this.time * 4.0);
+
+    for (const h of hostiles) {
+      const pos = this.worldToChart(h.position.x, h.position.y, width, height);
+
+      ctx.save();
+      ctx.translate(pos.x, pos.y);
+
+      // Pulsing crimson threat ring
+      ctx.strokeStyle = `rgba(239, 68, 68, ${0.45 + pulse * 0.40})`;
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.arc(0, 0, 8 + pulse * 4, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Core danger dot
+      ctx.fillStyle = h.category === 'vessel' ? '#ef4444' : '#f97316';
+      ctx.beginPath();
+      ctx.arc(0, 0, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Label
+      ctx.fillStyle = '#fca5a5';
+      ctx.font = 'bold 9px "Segoe UI", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText(h.name, 0, 8);
 
       ctx.restore();
     }

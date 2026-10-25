@@ -182,6 +182,26 @@ export function checkConeDetection(
   return diff <= coneAngleRad / 2;
 }
 
+const HOSTILE_SPRITE_CACHE: Map<string, HTMLImageElement> = new Map();
+
+function getHostileSprite(assetKey: string): HTMLImageElement | null {
+  if (typeof Image === 'undefined') return null;
+  let img = HOSTILE_SPRITE_CACHE.get(assetKey);
+  if (!img) {
+    try {
+      img = new Image();
+      img.src = `./assets/sprites/fishing/${assetKey}`;
+      HOSTILE_SPRITE_CACHE.set(assetKey, img);
+    } catch {
+      return null;
+    }
+  }
+  if (img && img.complete && img.naturalWidth > 0) {
+    return img;
+  }
+  return null;
+}
+
 export class HostileEntity {
   public id: string;
   public name: string;
@@ -263,8 +283,8 @@ export class HostileEntity {
     );
 
     if (this.alertState === 'patrol') {
-      if (inCone) {
-        this.alertState = 'alert';
+      if (inCone || distToPlayer <= 135) {
+        this.alertState = distToPlayer <= 110 ? 'pursuit' : 'alert';
         this.alertTimer = 1.0;
         this.decayTimer = 2.0;
         if (!this.hornPlayed) {
@@ -277,9 +297,9 @@ export class HostileEntity {
         this.wander(dt, this.speed * 0.5);
       }
     } else if (this.alertState === 'alert') {
-      if (inCone) {
+      if (inCone || distToPlayer <= 135) {
         this.alertTimer = Math.max(0, this.alertTimer - dt);
-        if (this.alertTimer <= 0) {
+        if (this.alertTimer <= 0 || distToPlayer <= 110) {
           this.alertState = 'pursuit';
         }
       } else {
@@ -423,41 +443,74 @@ export class HostileEntity {
   }
 
   private renderVessel(ctx: CanvasRenderingContext2D): void {
+    // Pulsing hostile contact aura ring
+    const pulse = 0.5 + 0.5 * Math.sin(this.animTime * 4.5);
+    ctx.strokeStyle = this.alertState === 'pursuit'
+      ? `rgba(239, 68, 68, ${0.45 + pulse * 0.35})`
+      : `rgba(245, 158, 11, ${0.22 + pulse * 0.18})`;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.arc(0, 0, 34 + pulse * 3, 0, Math.PI * 2);
+    ctx.stroke();
+
     // Hull silhouette
     ctx.fillStyle = this.alertState === 'pursuit' ? '#7f1d1d' : (this.alertState === 'alert' ? '#78350f' : '#1f2937');
     ctx.strokeStyle = this.alertState === 'pursuit' ? '#ef4444' : '#9ca3af';
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 1.8;
 
     ctx.beginPath();
-    ctx.moveTo(22, 0);
-    ctx.lineTo(-14, -10);
-    ctx.lineTo(-18, 0);
-    ctx.lineTo(-14, 10);
+    ctx.moveTo(28, 0);
+    ctx.lineTo(-18, -13);
+    ctx.lineTo(-24, 0);
+    ctx.lineTo(-18, 13);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
 
+    // Draw sprite overlay if loaded
+    const sprite = getHostileSprite(this.spriteAssetKey);
+    if (sprite && typeof ctx.drawImage === 'function') {
+      ctx.save();
+      ctx.globalAlpha = 0.92;
+      ctx.drawImage(sprite, -30, -22, 60, 44);
+      ctx.restore();
+    }
+
     // Mast and deck lantern
     ctx.fillStyle = '#f59e0b';
     ctx.beginPath();
-    ctx.arc(4, 0, 3, 0, Math.PI * 2);
+    ctx.arc(6, 0, 3.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Alert indicator
+    // Upright nameplate & alert indicator
+    ctx.save();
+    ctx.rotate(-this.heading);
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 10px "Cinzel", Georgia, serif';
+    ctx.fillStyle = this.alertState === 'pursuit' ? '#fca5a5' : '#fde68a';
+    ctx.fillText(this.name, 0, 32);
+
     if (this.alertState === 'alert' || this.alertState === 'pursuit') {
-      ctx.save();
-      ctx.rotate(-this.heading); // upright text
-      ctx.font = 'bold 12px sans-serif';
+      ctx.font = 'bold 14px sans-serif';
       ctx.fillStyle = this.alertState === 'pursuit' ? '#ef4444' : '#f59e0b';
-      ctx.textAlign = 'center';
-      ctx.fillText(this.alertState === 'pursuit' ? '!' : '?', 0, -22);
-      ctx.restore();
+      ctx.fillText(this.alertState === 'pursuit' ? '⚔ RAM / ENGAGE!' : '?', 0, -26);
     }
+    ctx.restore();
   }
 
   private renderBeast(ctx: CanvasRenderingContext2D): void {
-    const shadowOffset = Math.sin(this.animTime * 2.0) * 15;
+    const shadowOffset = Math.sin(this.animTime * 2.0) * 10;
     const isBreaching = this.alertState === 'breach_charge';
+    const pulse = 0.5 + 0.5 * Math.sin(this.animTime * 5.0);
+
+    // Pulsing beast contact ring
+    ctx.strokeStyle = isBreaching
+      ? `rgba(239, 68, 68, ${0.50 + pulse * 0.35})`
+      : `rgba(52, 211, 153, ${0.28 + pulse * 0.20})`;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.arc(0, 0, 36 + pulse * 4, 0, Math.PI * 2);
+    ctx.stroke();
 
     if (isBreaching) {
       // Breached monster
@@ -466,37 +519,62 @@ export class HostileEntity {
       ctx.lineWidth = 2.0;
 
       ctx.beginPath();
-      ctx.ellipse(0, 0, 26, 14, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, 0, 30, 16, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
+
+      const sprite = getHostileSprite(this.spriteAssetKey);
+      if (sprite && typeof ctx.drawImage === 'function') {
+        ctx.save();
+        ctx.globalAlpha = 0.92;
+        ctx.drawImage(sprite, -32, -22, 64, 44);
+        ctx.restore();
+      }
 
       // Glowing eldritch eye
       ctx.fillStyle = '#ef4444';
       ctx.beginPath();
-      ctx.arc(12, -4, 3, 0, Math.PI * 2);
-      ctx.arc(12, 4, 3, 0, Math.PI * 2);
+      ctx.arc(14, -5, 3.2, 0, Math.PI * 2);
+      ctx.arc(14, 5, 3.2, 0, Math.PI * 2);
       ctx.fill();
 
       // Thrashing foam ripples
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
       ctx.beginPath();
-      ctx.arc(0, 0, 32 + Math.sin(this.animTime * 6) * 4, 0, Math.PI * 2);
+      ctx.arc(0, 0, 34 + Math.sin(this.animTime * 6) * 4, 0, Math.PI * 2);
       ctx.stroke();
     } else {
       // Submerged murky shadow
       ctx.save();
       ctx.translate(shadowOffset, 0);
-      ctx.fillStyle = 'rgba(6, 30, 25, 0.65)';
+      ctx.fillStyle = 'rgba(6, 30, 25, 0.78)';
+      ctx.strokeStyle = 'rgba(45, 212, 191, 0.45)';
+      ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.ellipse(0, 0, 28, 12, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, 0, 30, 14, 0, 0, Math.PI * 2);
       ctx.fill();
+      ctx.stroke();
 
       // Serpent/tail undulation
       ctx.beginPath();
-      ctx.ellipse(-24, Math.sin(this.animTime * 3) * 6, 12, 6, 0, 0, Math.PI * 2);
+      ctx.ellipse(-26, Math.sin(this.animTime * 3) * 6, 14, 7, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     }
+
+    // Upright nameplate
+    ctx.save();
+    ctx.rotate(-this.heading);
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 10px "Cinzel", Georgia, serif';
+    ctx.fillStyle = isBreaching ? '#fca5a5' : '#6ee7b7';
+    ctx.fillText(this.name, 0, 34);
+    if (isBreaching) {
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillStyle = '#ef4444';
+      ctx.fillText('🦑 BREACH!', 0, -28);
+    }
+    ctx.restore();
   }
 }
 
@@ -598,6 +676,52 @@ export class RoamingHostileManager {
     return engagedHostile;
   }
 
+  /**
+   * Hull-to-hull touch collision check between the player boat (bow, center, stern)
+   * and any roaming hostile entity's hull/body so touching any part of the enemy
+   * immediately initiates combat.
+   */
+  public checkBoatCollision(boat: { position: { x: number; y: number }; heading?: number; radius?: number }): HostileEntity | null {
+    const bx = boat.position.x;
+    const by = boat.position.y;
+    const bHeading = boat.heading ?? 0;
+    const bCos = Math.cos(bHeading);
+    const bSin = Math.sin(bHeading);
+
+    const boatPoints = [
+      { x: bx, y: by },
+      { x: bx + bCos * 25, y: by + bSin * 25 },
+      { x: bx - bCos * 25, y: by - bSin * 25 }
+    ];
+
+    for (const h of this.hostiles) {
+      const hx = h.position.x;
+      const hy = h.position.y;
+      const centerDist = Math.hypot(bx - hx, by - hy);
+      if (centerDist <= 68) {
+        return h;
+      }
+
+      const hCos = Math.cos(h.heading);
+      const hSin = Math.sin(h.heading);
+      const hostilePoints = [
+        { x: hx, y: hy },
+        { x: hx + hCos * 24, y: hy + hSin * 24 },
+        { x: hx - hCos * 24, y: hy - hSin * 24 }
+      ];
+
+      for (const bp of boatPoints) {
+        for (const hp of hostilePoints) {
+          if (Math.hypot(bp.x - hp.x, bp.y - hp.y) <= 52) {
+            return h;
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
   public renderWorld(ctx: CanvasRenderingContext2D, camera: Camera): void {
     for (const h of this.hostiles) {
       h.render(ctx, camera);
@@ -606,16 +730,26 @@ export class RoamingHostileManager {
 
   public renderLighting(lightingCtx: CanvasRenderingContext2D, camera: Camera, _dpr: number = 1): void {
     for (const h of this.hostiles) {
-      if (h.category === 'vessel') {
-        const screen = camera.worldToScreen(new Vector2(h.position.x, h.position.y));
+      const screen = camera.worldToScreen(new Vector2(h.position.x, h.position.y));
 
-        lightingCtx.save();
-        lightingCtx.translate(screen.x, screen.y);
+      lightingCtx.save();
+      lightingCtx.translate(screen.x, screen.y);
+      lightingCtx.globalCompositeOperation = 'destination-out';
+
+      // Ambient visibility halo around every hostile entity
+      const haloGrad = lightingCtx.createRadialGradient(0, 0, 6, 0, 0, 110);
+      haloGrad.addColorStop(0, 'rgba(0, 0, 0, 0.80)');
+      haloGrad.addColorStop(0.5, 'rgba(0, 0, 0, 0.40)');
+      haloGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      lightingCtx.fillStyle = haloGrad;
+      lightingCtx.beginPath();
+      lightingCtx.arc(0, 0, 110, 0, Math.PI * 2);
+      lightingCtx.fill();
+
+      if (h.category === 'vessel') {
         lightingCtx.rotate(h.heading);
 
         // Punch forward searchlight cone out of darkness mask
-        lightingCtx.globalCompositeOperation = 'destination-out';
-
         const coneGrad = lightingCtx.createRadialGradient(0, 0, 10, 0, 0, HOSTILE_CONE_DISTANCE);
         coneGrad.addColorStop(0, 'rgba(0, 0, 0, 0.85)');
         coneGrad.addColorStop(0.35, 'rgba(0, 0, 0, 0.65)');
@@ -634,9 +768,9 @@ export class RoamingHostileManager {
         );
         lightingCtx.closePath();
         lightingCtx.fill();
-
-        lightingCtx.restore();
       }
+
+      lightingCtx.restore();
     }
   }
 

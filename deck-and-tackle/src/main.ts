@@ -319,8 +319,10 @@ export class Game {
     // 3. Update map elements (ripples, spots, dock triggers)
     this.map.update(dt, this.boat.position, false);
 
-    // 3b. Update roaming hostiles and check combat engagement (distance <= 45px)
-    const engagedHostile = this.roamingHostiles.update(dt, this.boat.position);
+    // 3b. Update roaming hostiles and check hull-to-hull touch / combat engagement
+    const engagedHostile =
+      this.roamingHostiles.update(dt, this.boat.position) ||
+      this.roamingHostiles.checkBoatCollision(this.boat);
     if (engagedHostile && !this.stateManager.isInTransition()) {
       this.triggerHostileCombat(engagedHostile);
       return;
@@ -643,11 +645,11 @@ export class Game {
       // 4. Render Boat Entity
       this.boat.render(this.ctx);
 
-      // Render Roaming Hostiles (vessels & submerged sea beast shadows) in world pass
-      this.roamingHostiles.renderWorld(this.ctx, this.camera);
-
       // 5. Restore World Transform
       this.camera.restoreTransform(this.ctx);
+
+      // 5b. Render Roaming Hostiles (screen-space via camera.worldToScreen, underneath darkness mask & fog)
+      this.roamingHostiles.renderWorld(this.ctx, this.camera);
 
       // 6. Overworld Post-Processing Atmosphere (Darkness Mask, Lantern Pools, Volumetric Fog, Vignette & Spores)
       this.renderOverworldLightingAndAtmosphere(this.ctx, this.width, this.height);
@@ -682,7 +684,8 @@ export class Game {
           this.boat.heading,
           this.map.fishingSpots,
           AtmosphereManager.HARBOR_CENTER,
-          this.map.islandColliders
+          this.map.islandColliders,
+          this.roamingHostiles.getHostiles()
         );
       }
 
@@ -919,7 +922,6 @@ export class Game {
   }
 
   private renderOverworldLightingAndAtmosphere(ctx: CanvasRenderingContext2D, width: number, height: number): void {
-    this.roamingHostiles.renderLighting(this.lightingCtx, this.camera, this.dpr);
     this.atmosphere.renderLightingAndAtmosphere(
       ctx,
       this.lightingCanvas,
@@ -930,7 +932,8 @@ export class Game {
       this.map.fishingSpots,
       width,
       height,
-      this.dpr
+      this.dpr,
+      (lCtx) => this.roamingHostiles.renderLighting(lCtx, this.camera, this.dpr)
     );
   }
 }

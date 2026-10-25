@@ -608,7 +608,8 @@ export class AtmosphereManager {
     fishingSpots: FishingSpot[],
     width: number,
     height: number,
-    dpr: number = 1
+    dpr: number = 1,
+    onRenderExtraLights?: (lightingCtx: CanvasRenderingContext2D) => void
   ): void {
     const p = this.currentParams;
     const flicker = p.lanternFlicker;
@@ -723,6 +724,10 @@ export class AtmosphereManager {
         lightingCtx.arc(sScreen.x, sScreen.y, spotRadius, 0, Math.PI * 2);
         lightingCtx.fill();
       }
+    }
+
+    if (onRenderExtraLights) {
+      onRenderExtraLights(lightingCtx);
     }
 
     lightingCtx.restore();
