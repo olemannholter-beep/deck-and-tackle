@@ -1,0 +1,164 @@
+[gd_scene load_steps=16 format=3 uid="uid://deckandtackle_overworld"]
+
+[ext_resource type="Script" path="res://scripts/Overworld.gd" id="1_overworld"]
+[ext_resource type="Shader" path="res://shaders/ocean_radial.gdshader" id="2_ocean_shader"]
+[ext_resource type="Script" path="res://scripts/Boat.gd" id="3_boat"]
+[ext_resource type="Script" path="res://scripts/HarborDockNode.gd" id="4_dock"]
+[ext_resource type="Shader" path="res://shaders/atmosphere_vignette.gdshader" id="5_vig_shader"]
+[ext_resource type="Texture2D" path="res://assets/sprites/overworld/island_1_sandbar_whale_skeleton.png" id="6_isl1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/overworld/island_2_black_rock_nests.png" id="7_isl2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/overworld/island_3_pine_islet.png" id="8_isl3"]
+[ext_resource type="Texture2D" path="res://assets/sprites/overworld/island_4_shipwreck_island.png" id="9_isl4"]
+[ext_resource type="Texture2D" path="res://assets/sprites/overworld/island_5_standing_stones.png" id="10_isl5"]
+[ext_resource type="Texture2D" path="res://assets/sprites/overworld/island_6_tide_pool_rocks.png" id="11_isl6"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ocean"]
+shader = ExtResource("2_ocean_shader")
+shader_parameter/world_size = Vector2(8000, 8000)
+shader_parameter/harbor_origin = Vector2(4000, 4000)
+shader_parameter/time_sec = 0.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_island"]
+radius = 90.0
+
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_island"]
+polygon = PackedVector2Array(-65, -45, 65, -45, 80, 10, 55, 60, -55, 60, -80, 10)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vignette"]
+shader = ExtResource("5_vig_shader")
+shader_parameter/vignette_intensity = 0.25
+shader_parameter/fog_density = 0.1
+shader_parameter/eldritch_pulse = 0.0
+shader_parameter/time_sec = 0.0
+
+[node name="Overworld" type="Node2D"]
+script = ExtResource("1_overworld")
+
+[node name="OceanShaderRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_ocean")
+offset_right = 8000.0
+offset_bottom = 8000.0
+mouse_filter = 2
+
+[node name="WorldDarknessModulate" type="CanvasModulate" parent="."]
+color = Color(0.86, 0.92, 0.88, 1)
+
+[node name="HarborDock" type="Node2D" parent="."]
+position = Vector2(4000, 4000)
+script = ExtResource("4_dock")
+
+[node name="Islands" type="Node2D" parent="."]
+
+[node name="Island1_WhaleSandbar" type="StaticBody2D" parent="Islands"]
+position = Vector2(4650, 3550)
+
+[node name="Sprite2D" type="Sprite2D" parent="Islands/Island1_WhaleSandbar"]
+scale = Vector2(0.42, 0.42)
+texture = ExtResource("6_isl1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Islands/Island1_WhaleSandbar"]
+shape = SubResource("CircleShape2D_island")
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Islands/Island1_WhaleSandbar"]
+occluder = SubResource("OccluderPolygon2D_island")
+
+[node name="Island2_BlackRockNests" type="StaticBody2D" parent="Islands"]
+position = Vector2(3150, 3300)
+
+[node name="Sprite2D" type="Sprite2D" parent="Islands/Island2_BlackRockNests"]
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("7_isl2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Islands/Island2_BlackRockNests"]
+shape = SubResource("CircleShape2D_island")
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Islands/Island2_BlackRockNests"]
+occluder = SubResource("OccluderPolygon2D_island")
+
+[node name="Island3_PineIslet" type="StaticBody2D" parent="Islands"]
+position = Vector2(4450, 4680)
+
+[node name="Sprite2D" type="Sprite2D" parent="Islands/Island3_PineIslet"]
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("8_isl3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Islands/Island3_PineIslet"]
+shape = SubResource("CircleShape2D_island")
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Islands/Island3_PineIslet"]
+occluder = SubResource("OccluderPolygon2D_island")
+
+[node name="Island4_ShipwreckReef" type="StaticBody2D" parent="Islands"]
+position = Vector2(2400, 4850)
+
+[node name="Sprite2D" type="Sprite2D" parent="Islands/Island4_ShipwreckReef"]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("9_isl4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Islands/Island4_ShipwreckReef"]
+shape = SubResource("CircleShape2D_island")
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Islands/Island4_ShipwreckReef"]
+occluder = SubResource("OccluderPolygon2D_island")
+
+[node name="Island5_StandingStones" type="StaticBody2D" parent="Islands"]
+position = Vector2(5850, 2500)
+
+[node name="Sprite2D" type="Sprite2D" parent="Islands/Island5_StandingStones"]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("10_isl5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Islands/Island5_StandingStones"]
+shape = SubResource("CircleShape2D_island")
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Islands/Island5_StandingStones"]
+occluder = SubResource("OccluderPolygon2D_island")
+
+[node name="Island6_TidePoolRocks" type="StaticBody2D" parent="Islands"]
+position = Vector2(3350, 4550)
+
+[node name="Sprite2D" type="Sprite2D" parent="Islands/Island6_TidePoolRocks"]
+scale = Vector2(0.42, 0.42)
+texture = ExtResource("11_isl6")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Islands/Island6_TidePoolRocks"]
+shape = SubResource("CircleShape2D_island")
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Islands/Island6_TidePoolRocks"]
+occluder = SubResource("OccluderPolygon2D_island")
+
+[node name="WhirlpoolsContainer" type="Node2D" parent="."]
+
+[node name="HostilesContainer" type="Node2D" parent="."]
+
+[node name="PlayerBoat" type="CharacterBody2D" parent="."]
+position = Vector2(4000, 4070)
+script = ExtResource("3_boat")
+
+[node name="Camera2D" type="Camera2D" parent="PlayerBoat"]
+limit_left = 0
+limit_top = 0
+limit_right = 8000
+limit_bottom = 8000
+position_smoothing_enabled = true
+position_smoothing_speed = 6.5
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="AtmosphereVignette" type="ColorRect" parent="UILayer"]
+material = SubResource("ShaderMaterial_vignette")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="HUDDrawer" type="Control" parent="UILayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

@@ -1,0 +1,33 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Deck & Tackle — Godot 4 Overworld Prototype"
+config/description="Playable Godot 4 Overworld Vertical Slice featuring GPU Radial Ocean Shaders, Real-Time 2D Dynamic Lighting, Whirlpool Lifecycle Spawner, and Roaming Hostiles."
+run/main_scene="res://scenes/Overworld.tscn"
+config/features=PackedStringArray("4.3", "Forward Plus")
+config/icon="res://icon.svg"
+
+[autoload]
+
+GameState="*res://scripts/GameState.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=1
+environment/defaults/default_clear_color=Color(0.015, 0.04, 0.06, 1)
