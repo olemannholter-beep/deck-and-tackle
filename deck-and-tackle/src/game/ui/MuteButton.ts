@@ -12,7 +12,7 @@ export class MuteButton {
   private clickFlashTimer: number = 0;
 
   /**
-   * Updates hover state, processes click, and checks keyboard shortcut [M]
+   * Updates hover state, processes click, and checks keyboard shortcut [U]
    * Returns true if a click on the button occurred.
    */
   public update(dt: number): boolean {
@@ -42,8 +42,8 @@ export class MuteButton {
       consumedClick = true;
     }
 
-    // Keyboard shortcut [M]
-    if (Input.isJustPressed('keym')) {
+    // Keyboard shortcut [U]
+    if (Input.isJustPressed('keyu')) {
       AudioManager.getInstance().playButtonClick();
       AudioManager.getInstance().toggleMusicMute();
       this.clickFlashTimer = 1.0;
@@ -143,7 +143,7 @@ export class MuteButton {
       ctx.globalAlpha = this.hoverProgress;
       const tipX = this.x + this.w + 10;
       const tipY = this.y + (this.h - 28) / 2;
-      const tipText = isMuted ? '🔇 Music: MUTED [M]' : '🎵 Music: ON [M]';
+      const tipText = isMuted ? '🔇 Music: MUTED [U]' : '🎵 Music: ON [U]';
       ctx.font = 'bold 12px "Segoe UI", sans-serif';
       const textWidth = ctx.measureText(tipText).width;
       const tipW = textWidth + 20;

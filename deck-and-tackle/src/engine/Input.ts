@@ -6,6 +6,7 @@ export class Input {
   private static mousePos: Vector2 = new Vector2(0, 0);
   private static mouseJustClicked: boolean = false;
   private static isMouseDown: boolean = false;
+  private static wheelDelta: number = 0;
   private static initialized: boolean = false;
   private static canvasRef: HTMLCanvasElement | null = null;
 
@@ -21,8 +22,8 @@ export class Input {
       }
       this.keysDown.add(code);
 
-      // Prevent default page scroll on Arrow keys and Space
-      if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'space'].includes(code)) {
+      // Prevent default page scroll and browser focus navigation
+      if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'space', 'tab'].includes(code)) {
         e.preventDefault();
       }
     });
@@ -74,6 +75,15 @@ export class Input {
         this.isMouseDown = false;
       }
     });
+
+    if (canvas && typeof canvas.addEventListener === 'function') {
+      canvas.addEventListener('wheel', (e: WheelEvent) => {
+        this.wheelDelta += e.deltaY;
+        if (typeof e.preventDefault === 'function') {
+          e.preventDefault();
+        }
+      }, { passive: false });
+    }
   }
 
   public static setCursor(cursor: string): void {
@@ -104,8 +114,19 @@ export class Input {
     return this.isMouseDown;
   }
 
+  public static getWheelDelta(): number {
+    return this.wheelDelta;
+  }
+
+  public static consumeWheelDelta(): number {
+    const delta = this.wheelDelta;
+    this.wheelDelta = 0;
+    return delta;
+  }
+
   public static updateEnd(): void {
     this.keysJustPressed.clear();
     this.mouseJustClicked = false;
+    this.wheelDelta = 0;
   }
 }

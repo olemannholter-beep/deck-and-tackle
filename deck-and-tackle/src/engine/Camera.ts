@@ -26,10 +26,12 @@ export class Camera {
   public resize(width: number, height: number): void {
     this.viewportWidth = width;
     this.viewportHeight = height;
+    this.clamp();
   }
 
   public setBounds(bounds: CameraBounds): void {
     this.bounds = bounds;
+    this.clamp();
   }
 
   public snapTo(pos: Vector2): void {
@@ -94,5 +96,16 @@ export class Camera {
     const centeredX = (worldPos.x - this.position.x) * this.zoom;
     const centeredY = (worldPos.y - this.position.y) * this.zoom;
     return new Vector2(this.viewportWidth / 2 + centeredX, this.viewportHeight / 2 + centeredY);
+  }
+
+  public getViewportBounds(margin: number = 0): { minX: number; minY: number; maxX: number; maxY: number } {
+    const halfW = (this.viewportWidth / 2) / this.zoom + margin;
+    const halfH = (this.viewportHeight / 2) / this.zoom + margin;
+    return {
+      minX: this.position.x - halfW,
+      minY: this.position.y - halfH,
+      maxX: this.position.x + halfW,
+      maxY: this.position.y + halfH
+    };
   }
 }

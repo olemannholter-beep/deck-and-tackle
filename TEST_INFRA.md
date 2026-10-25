@@ -1,43 +1,52 @@
-# E2E Test Infra: Fishing Zones Environment Redesign
+# E2E Test Infra: Deck and Tackle Overworld 8000x8000 Expansion
 
 ## Test Philosophy
-- Opaque-box, requirement-driven validation derived directly from `ORIGINAL_REQUEST.md` (R1–R4).
-- Independent verification across both the TypeScript game engine (`deck-and-tackle`) and the standalone preview (`side_view_battle_redesign_preview.html`).
-- Methodology: Systematic 4-tier testing (Category-Partition, Boundary Value Analysis, Pairwise Combinations, Real-World Workloads).
+- Opaque-box, requirement-driven testing. Derived strictly from `ORIGINAL_REQUEST.md` (2026-10-25T11:46:20Z) and user-facing acceptance criteria.
+- Zero dependencies on internal private engine variables; exercises the game through external entry points, coordinate states, and verifiable behaviors.
+- Methodology: Category-Partition (Tier 1), Boundary Value Analysis (Tier 2), Pairwise Combinations (Tier 3), and Real-World Nautical Workloads (Tier 4).
 
-## Feature Inventory & Test Mapping
-| # | Feature | Requirement | Tier 1 (Specs) | Tier 2 (Boundaries) | Tier 3 (Cross-Feature) | Tier 4 (Scenarios) |
-|---|---------|-------------|:--------------:|:-------------------:|:----------------------:|:------------------:|
-| 1 | Zone 1 Coastal Atmosphere | R1: Calm stormy night sky, lighthouse cliff | 5 | 5 | ✓ | ✓ |
-| 2 | Zone 2 Reef Atmosphere | R1: Twilight fog, dock pilings, kelp | 5 | 5 | ✓ | ✓ |
-| 3 | Zone 3 Trench Atmosphere | R1: Tempest squall, rain haze | 5 | 5 | ✓ | ✓ |
-| 4 | Zone 4 Cavern Rock Ceiling | R1: Subterranean rock vault, stalactites, no open sky | 5 | 5 | ✓ | ✓ |
-| 5 | Zone 1 Wave Swells | R2: Misty rolling swell, low freq, pale foam | 5 | 5 | ✓ | ✓ |
-| 6 | Zone 2 Moonlit Wave Chop | R2: Moonlit crest ribbons, shallow chop | 5 | 5 | ✓ | ✓ |
-| 7 | Zone 3 Storm Breakers | R2: Crashing breakers, whitecap spray | 5 | 5 | ✓ | ✓ |
-| 8 | Zone 4 Churning Seafoam | R2: Churning foam, boiling froth, heat bubbles | 5 | 5 | ✓ | ✓ |
-| 9 | Water Column Color Palettes | R3: Slate green, emerald teal, abyssal navy, sulfurous amber | 5 | 5 | ✓ | ✓ |
-| 10 | Environmental Props & Fauna | R3: Anemones, galleon wreck, kraken, chimney vents, minnows | 5 | 5 | ✓ | ✓ |
-| 11 | Engine Dynamic Binding | R4: SideViewDiorama zone switching | 5 | 5 | ✓ | ✓ |
-| 12 | Preview Stage Synchronization | R4: Buttons 1..4 switch all layers dynamically | 5 | 5 | ✓ | ✓ |
+---
+
+## Feature Inventory
+| # | Feature | Source (requirement) | Tier 1 | Tier 2 | Tier 3 |
+|---|---------|---------------------|:------:|:------:|:------:|
+| 1 | 8000x8000 Map Dimensions & Harbor Center (4000, 4000) | ORIGINAL_REQUEST §R1 | 5 | 5 | ✓ |
+| 2 | Camera Boundary Clamping at (0,0) and (8000,8000) | ORIGINAL_REQUEST §R1 | 5 | 5 | ✓ |
+| 3 | Visual Drift Cues (Particles, Wave Crests, Bathymetry) | ORIGINAL_REQUEST §R1 | 5 | 5 | ✓ |
+| 4 | Concentric Radial Difficulty Zones (1200, 2400, 3600 px) | ORIGINAL_REQUEST §R2 | 5 | 5 | ✓ |
+| 5 | Atmospheric Transitions (Water, Fog, Lantern, Vignette) | ORIGINAL_REQUEST §R2 | 5 | 5 | ✓ |
+| 6 | Ephemeral Whirlpool Spawner Quotas (6-8 Global, 2-3 Local) | ORIGINAL_REQUEST §R3 | 5 | 5 | ✓ |
+| 7 | Whirlpool State Machine (Spawn 2.5s, Active, Despawn 3.0s) | ORIGINAL_REQUEST §R3 | 5 | 5 | ✓ |
+| 8 | Despawn Proximity Locking & Post-Fishing Despawn | ORIGINAL_REQUEST §R3 | 5 | 5 | ✓ |
+| 9 | Radial Zone Fish Encounter Binding (Perch, Pike, Gar, Dagon)| ORIGINAL_REQUEST §R3 | 5 | 5 | ✓ |
+| 10 | Brass Compass Rose Bearing & Harbor Metric Distance | ORIGINAL_REQUEST §R4 | 5 | 5 | ✓ |
+| 11 | Interactive Sea Chart Overlay (M / Tab Toggle & Markers) | ORIGINAL_REQUEST §R4 | 5 | 5 | ✓ |
+| 12 | Build Integrity & Zero Regressions (npm run build) | ORIGINAL_REQUEST AC | 5 | 5 | ✓ |
+
+---
 
 ## Test Architecture
-- **Test Runner**: Node v20 built-in test runner (`node --test tests/e2e/*.test.mjs`) supplemented by Python asset/DOM validation (`py tests/e2e/verify_preview.py`).
-- **Test Suite Location**: `c:\Users\olema\Desktop\testing topdown\tests\e2e\`
-- **Execution Script**: `npm run build && node --test tests/e2e/zone_e2e.test.mjs`
-- **Output / Reporting**: TAP / spec reporter with exit code 0 on 100% pass.
+- **Runner**: Node.js / TypeScript automated headless runner (`tests/run_e2e_overworld_tests.ts` or standalone JS runner).
+- **Execution Command**: `npm run build && npx tsx tests/run_e2e_overworld_tests.ts`
+- **Output**: JSON test report and standard console exit code (0 for pass, non-zero for failure).
+- **Artifacts**: Publishes `TEST_READY.md` upon completion with full pass/fail matrix.
+
+---
 
 ## Real-World Application Scenarios (Tier 4)
-| # | Scenario | Features Exercised | Expected Outcome |
-|---|----------|--------------------|------------------|
-| S1 | Coastal Perch Excursion | F1, F5, F9, F10, F11, F12 | Calm dark sky, lighthouse cliff on horizon, gentle rolling swell, slate water |
-| S2 | Sunken Reef Pike Hunt | F2, F6, F9, F10, F11, F12 | Eerie twilight dusk, dock pilings, moonlit wave chop, emerald water, kelp |
-| S3 | Deep Abyss Galleon Expedition | F3, F7, F9, F10, F11, F12 | Dark tempest squall, storm breakers with spray, galleon wreck, anemones, kraken |
-| S4 | Subterranean Dagon Lair Descent | F4, F8, F9, F10, F11, F12 | Enclosed rock vault ceiling (NO sky/moon), stalactites, boiling foam, vents |
-| S5 | Rapid Stage Cycling (1 &rarr; 2 &rarr; 3 &rarr; 4 &rarr; 1) | F11, F12 | Immediate switch of all visual layers without texture popping or stale state |
+| # | Scenario | Features Exercised | Complexity |
+|---|----------|--------------------|------------|
+| 1 | Full Circumferential Voyage | F1, F2, F4, F5, F10 | High |
+| 2 | Trench Deep Delve & Dagon Encounter | F1, F4, F5, F8, F9 | High |
+| 3 | Whirlpool Proximity Lock & Post-Catch Despawn | F6, F7, F8, F9 | Medium |
+| 4 | High-Speed Open Water Navigation via Compass & Sea Chart | F1, F3, F10, F11 | Medium |
+| 5 | Multi-Zone Fishing Expedition (Harbor to Abyss to Harbor) | F1, F4, F6, F9, F10, F11 | High |
+
+---
 
 ## Coverage Thresholds
-- Tier 1: ≥ 60 test cases (≥5 per feature across 12 features)
-- Tier 2: ≥ 60 boundary and edge test cases (depth boundaries, missing parameters, invalid zones)
-- Tier 3: Pairwise combinations of depth transitions, species assignments, and stage toggles
-- Tier 4: ≥ 5 realistic application workflows
+- **Tier 1 (Feature Coverage)**: ≥5 test cases per feature (12 features × 5 = 60 test cases)
+- **Tier 2 (Boundary & Corner Cases)**: ≥5 test cases per feature (12 features × 5 = 60 test cases)
+- **Tier 3 (Cross-Feature Combinations)**: ≥12 pairwise test cases
+- **Tier 4 (Real-World Application Scenarios)**: ≥5 end-to-end voyage scenarios
+- **Total Minimum Target**: ≥137 comprehensive test cases

@@ -111,6 +111,7 @@ export const ZONE_PROFILES: Record<ZoneTier, ZoneProfile> = {
       ]
     },
     ambientFishSprites: [
+      'fish_animated_minnow_sheet.png',
       'fish_school_minnows.png',
       'fish_shadowy_minnow_tiny1.png',
       'fish_shadowy_perch_s6.png'

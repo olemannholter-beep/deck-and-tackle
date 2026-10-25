@@ -8,21 +8,11 @@ import { HarborShopOverlay } from './game/ui/HarborShopOverlay';
 import { MainMenuOverlay } from './game/ui/MainMenuOverlay';
 import { MuteButton } from './game/ui/MuteButton';
 import { HUD } from './game/ui/HUD';
+import { SeaChartOverlay } from './game/ui/SeaChartOverlay';
 import { FishingSpot } from './game/overworld/FishingSpot';
 import { PlayerInventory } from './game/player/PlayerInventory';
-import { Vector2 } from './engine/Vector2';
 import { AudioManager } from './engine/AudioManager';
-
-interface AmbientSpore {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  radius: number;
-  life: number;
-  maxLife: number;
-  color: string;
-}
+import { AtmosphereManager } from './game/overworld/AtmosphereManager';
 
 class Game {
   private canvas: HTMLCanvasElement;
@@ -38,13 +28,14 @@ class Game {
   public mainMenuOverlay: MainMenuOverlay;
   public muteButton: MuteButton;
   public hud: HUD;
+  public seaChart: SeaChartOverlay;
+  public atmosphere: AtmosphereManager;
+  public get atmosphereManager(): AtmosphereManager { return this.atmosphere; }
+  public currentActiveFishingSpot: FishingSpot | null = null;
 
   // Dynamic Lighting Canvas for darkness mask & lantern illumination
   private lightingCanvas: HTMLCanvasElement;
   private lightingCtx: CanvasRenderingContext2D;
-
-  // Drifting Bioluminescent Spores Particle System
-  private spores: AmbientSpore[] = [];
 
   private width: number = window.innerWidth;
   private height: number = window.innerHeight;
@@ -74,12 +65,16 @@ class Game {
     this.stateManager = new GameStateManager(GameState.MainMenu);
     this.camera = new Camera(this.width, this.height);
     this.map = new OverworldMap();
+    this.atmosphere = new AtmosphereManager();
+    this.map.setAtmosphereManager(this.atmosphere);
     this.hud = new HUD();
+    this.seaChart = new SeaChartOverlay();
+    this.hud.onToggleChart = () => this.seaChart.toggle();
     this.muteButton = new MuteButton();
     AudioManager.getInstance().startSoundtrack();
 
-    // Spawn boat at harbor dock cove (starts frozen while in MainMenu)
-    this.boat = new Boat(400, 1370, -Math.PI / 4);
+    // Spawn boat at central safe harbor (starts frozen while in MainMenu)
+    this.boat = new Boat(4000, 4000, -Math.PI / 2);
     this.boat.isFrozen = true;
 
     // Set camera limits to map dimensions
@@ -109,10 +104,7 @@ class Game {
       }
     });
 
-    // 6. Initialize Ambient Spores
-    this.initSpores();
-
-    // 7. Handle window resizing
+    // 6. Handle window resizing
     this.handleResize();
     window.addEventListener('resize', () => this.handleResize());
 
@@ -162,8 +154,19 @@ class Game {
   }
 
   private returnToOverworld(): void {
+    if (this.currentActiveFishingSpot) {
+      if (this.diorama.battle && this.diorama.battle.status === 'victory') {
+        this.map.onFishingVictory(this.currentActiveFishingSpot.id);
+        this.currentActiveFishingSpot.triggerDespawn();
+      } else {
+        this.currentActiveFishingSpot.isFishingLocked = false;
+      }
+      this.currentActiveFishingSpot = null;
+    }
+
     this.stateManager.changeState(GameState.OverworldExploration);
     this.camera.target.copy(this.boat.position);
+    this.camera.snapTo(this.boat.position);
     Input.setCursor('default');
   }
 
@@ -196,55 +199,24 @@ class Game {
       this.updateOverworld(dt);
     } else if (currentState === GameState.SideViewBattle) {
       this.diorama.update(dt, this.width, this.height);
+      this.map.update(dt, this.boat.position, true);
     } else if (currentState === GameState.HarborShop) {
       this.shopOverlay.update(dt, this.width, this.height);
     }
   }
 
-  private initSpores(): void {
-    this.spores = [];
-    for (let i = 0; i < 35; i++) {
-      this.spores.push({
-        x: Math.random() * this.width,
-        y: Math.random() * this.height,
-        vx: (Math.random() - 0.5) * 12 + 6,
-        vy: -8 - Math.random() * 12,
-        radius: 1.0 + Math.random() * 2.2,
-        life: Math.random() * 5,
-        maxLife: 5 + Math.random() * 4,
-        color: Math.random() > 0.4 ? '#2dd4bf' : (Math.random() > 0.5 ? '#6ee7b7' : '#a7f3d0')
-      });
-    }
-  }
-
-  private updateSpores(dt: number): void {
-    for (let i = this.spores.length - 1; i >= 0; i--) {
-      const s = this.spores[i];
-      s.life += dt;
-      s.x += (s.vx + Math.sin(s.life * 1.4) * 8) * dt;
-      s.y += s.vy * dt;
-
-      if (s.life >= s.maxLife || s.y < -30 || s.x > this.width + 60 || s.x < -60) {
-        this.spores.splice(i, 1);
-      }
-    }
-
-    // Replenish spores up to 45
-    while (this.spores.length < 45) {
-      this.spores.push({
-        x: Math.random() * (this.width + 120) - 60,
-        y: this.height + 15 + Math.random() * 20,
-        vx: (Math.random() - 0.5) * 12 + 6,
-        vy: -10 - Math.random() * 14,
-        radius: 1.0 + Math.random() * 2.0,
-        life: 0,
-        maxLife: 6 + Math.random() * 5,
-        color: Math.random() > 0.4 ? '#2dd4bf' : (Math.random() > 0.5 ? '#6ee7b7' : '#a7f3d0')
-      });
-    }
-  }
-
   private updateOverworld(dt: number): void {
+    // 0. Update Sea Chart overlay and check open state
+    this.seaChart.update(dt, this.width, this.height, this.boat.position);
+    const isChartOpen = this.seaChart.isOpen();
+
+    // Freeze boat controls when Sea Chart is open
+    if (isChartOpen) {
+      this.boat.isFrozen = true;
+    } else if (!this.stateManager.isInTransition()) {
+      this.boat.isFrozen = false;
+    }
+
     // 1. Update boat physics & hydrodynamic movement
     this.boat.update(dt);
 
@@ -252,28 +224,30 @@ class Game {
     this.map.resolveCollisions(this.boat.position, this.boat.radius, this.boat.velocity.magnitude());
 
     // 3. Update map elements (ripples, spots, dock triggers)
-    this.map.update(dt, this.boat.position);
+    this.map.update(dt, this.boat.position, false);
 
     // 4. Camera smoothly tracks boat
     this.camera.target.copy(this.boat.position);
     this.camera.update(dt);
 
-    // 5. Update drifting bioluminescent spores
-    this.updateSpores(dt);
+    // 5. Update Atmosphere & Weather (concentric zones, fog, rain squall, miasma)
+    this.atmosphere.update(dt, this.boat.position, this.camera.position, this.width, this.height);
 
     // 6. HUD update
     this.hud.update(dt);
 
-    // 7. Check interactive triggers ('E' or 'Space')
+    // 7. Check interactive triggers ('E' or 'Space') only when chart is closed
     const nearbySpot = this.getNearbyFishingSpot();
     const isNearDock = this.map.harborDock.isPlayerNearby;
 
-    if (!this.stateManager.isInTransition()) {
+    if (!this.stateManager.isInTransition() && !isChartOpen) {
       if ((Input.isJustPressed('keye') || Input.isJustPressed('space'))) {
         if (nearbySpot) {
           AudioManager.getInstance().playButtonClick();
           // Freeze boat and transition smoothly to Bobber Minigame -> Battle Diorama
           this.boat.isFrozen = true;
+          this.currentActiveFishingSpot = nearbySpot;
+          nearbySpot.isFishingLocked = true;
           this.diorama.setEncounter(nearbySpot.zoneType, nearbySpot.name, nearbySpot.speciesType);
           this.stateManager.changeState(GameState.SideViewBattle);
         } else if (isNearDock) {
@@ -287,12 +261,7 @@ class Game {
   }
 
   private getNearbyFishingSpot(): FishingSpot | null {
-    for (const spot of this.map.fishingSpots) {
-      if (spot.isPlayerNearby) {
-        return spot;
-      }
-    }
-    return null;
+    return this.map.getNearbyFishingSpot(this.boat.position);
   }
 
   private render(): void {
@@ -337,290 +306,48 @@ class Game {
         this.inventory.gold,
         this.inventory.deck.length
       );
+
+      // 8. Render interactive full-screen Sea Chart overlay modal
+      if (this.seaChart.isOpen()) {
+        this.seaChart.render(
+          this.ctx,
+          this.width,
+          this.height,
+          this.boat.position,
+          this.boat.heading,
+          this.map.fishingSpots,
+          AtmosphereManager.HARBOR_CENTER,
+          this.map.islandColliders
+        );
+      }
     } else if (currentState === GameState.SideViewBattle) {
       this.diorama.render(this.ctx, this.width, this.height);
     } else if (currentState === GameState.HarborShop) {
       this.shopOverlay.render(this.ctx, this.width, this.height);
     }
 
-    // Render persistent Mute Button in the left corner
-    this.muteButton.render(this.ctx);
+    // Render persistent Mute Button in the left corner (hidden while full-screen Sea Chart is open)
+    if (!this.seaChart.isOpen()) {
+      this.muteButton.render(this.ctx);
+    }
 
     // Render seamless screen transition overlay
     this.stateManager.renderTransitionOverlay(this.ctx, this.width, this.height);
   }
 
   private renderOverworldLightingAndAtmosphere(ctx: CanvasRenderingContext2D, width: number, height: number): void {
-    const t = performance.now() * 0.001;
-    const boatLanternPos = this.boat.getLanternPosition();
-    const boatScreen = this.camera.worldToScreen(boatLanternPos);
-
-    // 1. Offscreen Darkness Mask Pass (punches transparent light pools into the oppressive darkness)
-    this.lightingCtx.save();
-    this.lightingCtx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-    this.lightingCtx.clearRect(0, 0, width, height);
-
-    // Deep Eldritch Abyss Darkness overlay
-    this.lightingCtx.fillStyle = 'rgba(2, 6, 14, 0.84)';
-    this.lightingCtx.fillRect(0, 0, width, height);
-
-    // Punch holes using 'destination-out'
-    this.lightingCtx.globalCompositeOperation = 'destination-out';
-
-    // A. Player Boat Ambient Light & Forward Conical Searchlight Beam
-    const flicker = 0.94 + Math.sin(t * 7.1) * 0.04 + Math.cos(t * 19.3) * 0.02;
-    const boatHeading = this.boat.heading;
-    const beamLength = 490 * flicker;
-    const ambientRadius = 140 * flicker;
-
-    // A1. Soft Ambient Circle (keeps boat, angler and immediate waters visible)
-    const ambientGrad = this.lightingCtx.createRadialGradient(
-      boatScreen.x, boatScreen.y, 8,
-      boatScreen.x, boatScreen.y, ambientRadius
+    this.atmosphere.renderLightingAndAtmosphere(
+      ctx,
+      this.lightingCanvas,
+      this.lightingCtx,
+      this.camera,
+      this.boat,
+      this.map.worldLanterns,
+      this.map.fishingSpots,
+      width,
+      height,
+      this.dpr
     );
-    ambientGrad.addColorStop(0, 'rgba(0, 0, 0, 1.0)');
-    ambientGrad.addColorStop(0.35, 'rgba(0, 0, 0, 0.90)');
-    ambientGrad.addColorStop(0.70, 'rgba(0, 0, 0, 0.50)');
-    ambientGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    this.lightingCtx.fillStyle = ambientGrad;
-    this.lightingCtx.beginPath();
-    this.lightingCtx.arc(boatScreen.x, boatScreen.y, ambientRadius, 0, Math.PI * 2);
-    this.lightingCtx.fill();
-
-    // A2. Forward Conical Beam (projects ahead along boat heading with feathered falloff)
-    this.lightingCtx.save();
-    this.lightingCtx.translate(boatScreen.x, boatScreen.y);
-    this.lightingCtx.rotate(boatHeading);
-
-    const conePasses = [
-      { halfAngle: 0.76, lenFactor: 0.88, alpha: 0.22 }, // Soft outer penumbra (~87 deg total arc)
-      { halfAngle: 0.58, lenFactor: 0.95, alpha: 0.35 }, // Mid spread (~66 deg total arc)
-      { halfAngle: 0.40, lenFactor: 1.00, alpha: 0.60 }, // Primary beam (~46 deg total arc)
-      { halfAngle: 0.22, lenFactor: 1.03, alpha: 0.85 }  // Intense forward core (~25 deg total arc)
-    ];
-
-    for (const pass of conePasses) {
-      const passLen = beamLength * pass.lenFactor;
-      const cGrad = this.lightingCtx.createRadialGradient(0, 0, 10, 0, 0, passLen);
-      cGrad.addColorStop(0, `rgba(0, 0, 0, ${pass.alpha})`);
-      cGrad.addColorStop(0.25, `rgba(0, 0, 0, ${pass.alpha * 0.95})`);
-      cGrad.addColorStop(0.60, `rgba(0, 0, 0, ${pass.alpha * 0.65})`);
-      cGrad.addColorStop(0.85, `rgba(0, 0, 0, ${pass.alpha * 0.25})`);
-      cGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-      this.lightingCtx.fillStyle = cGrad;
-      this.lightingCtx.beginPath();
-      this.lightingCtx.moveTo(0, 0);
-      this.lightingCtx.arc(0, 0, passLen, -pass.halfAngle, pass.halfAngle);
-      this.lightingCtx.closePath();
-      this.lightingCtx.fill();
-    }
-    this.lightingCtx.restore();
-
-    // B. World Lanterns Light Pools (Harbor Dock, Central Shrine, Spire Beacon, Outpost)
-    for (const lantern of this.map.worldLanterns) {
-      const lScreen = this.camera.worldToScreen(new Vector2(lantern.x, lantern.y));
-      if (
-        lScreen.x >= -lantern.radius &&
-        lScreen.x <= width + lantern.radius &&
-        lScreen.y >= -lantern.radius &&
-        lScreen.y <= height + lantern.radius
-      ) {
-        const wGrad = this.lightingCtx.createRadialGradient(
-          lScreen.x, lScreen.y, 8,
-          lScreen.x, lScreen.y, lantern.radius
-        );
-        wGrad.addColorStop(0, 'rgba(0, 0, 0, 1.0)');
-        wGrad.addColorStop(0.4, 'rgba(0, 0, 0, 0.88)');
-        wGrad.addColorStop(0.7, 'rgba(0, 0, 0, 0.50)');
-        wGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        this.lightingCtx.fillStyle = wGrad;
-        this.lightingCtx.beginPath();
-        this.lightingCtx.arc(lScreen.x, lScreen.y, lantern.radius, 0, Math.PI * 2);
-        this.lightingCtx.fill();
-      }
-    }
-
-    // C. Swirling Bioluminescent Fishing Spot Light Pools
-    for (const spot of this.map.fishingSpots) {
-      const sScreen = this.camera.worldToScreen(spot.position);
-      const spotRadius = 145;
-      if (
-        sScreen.x >= -spotRadius &&
-        sScreen.x <= width + spotRadius &&
-        sScreen.y >= -spotRadius &&
-        sScreen.y <= height + spotRadius
-      ) {
-        const sGrad = this.lightingCtx.createRadialGradient(
-          sScreen.x, sScreen.y, 6,
-          sScreen.x, sScreen.y, spotRadius
-        );
-        sGrad.addColorStop(0, 'rgba(0, 0, 0, 0.65)');
-        sGrad.addColorStop(0.5, 'rgba(0, 0, 0, 0.32)');
-        sGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        this.lightingCtx.fillStyle = sGrad;
-        this.lightingCtx.beginPath();
-        this.lightingCtx.arc(sScreen.x, sScreen.y, spotRadius, 0, Math.PI * 2);
-        this.lightingCtx.fill();
-      }
-    }
-
-    this.lightingCtx.restore();
-
-    // 2. Composite Darkness Mask onto Main Canvas
-    ctx.drawImage(this.lightingCanvas, 0, 0, width, height);
-
-    // 3. Colored Lantern Bloom & Halos (Lighter Composite Operation)
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
-
-    // Boat Lantern Warm Amber/Sickly Green Ambient Halo
-    const haloGrad = ctx.createRadialGradient(
-      boatScreen.x, boatScreen.y, 4,
-      boatScreen.x, boatScreen.y, ambientRadius * 0.95
-    );
-    haloGrad.addColorStop(0, `rgba(254, 240, 138, ${0.35 * flicker})`);
-    haloGrad.addColorStop(0.35, `rgba(234, 179, 8, ${0.18 * flicker})`);
-    haloGrad.addColorStop(0.70, `rgba(163, 230, 53, ${0.06 * flicker})`);
-    haloGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    ctx.fillStyle = haloGrad;
-    ctx.beginPath();
-    ctx.arc(boatScreen.x, boatScreen.y, ambientRadius * 0.95, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Boat Forward Searchlight Colored Conical Beam
-    ctx.save();
-    ctx.translate(boatScreen.x, boatScreen.y);
-    ctx.rotate(boatHeading);
-
-    const bloomPasses = [
-      { halfAngle: 0.74, lenFactor: 0.88, color: '163, 230, 53', alpha: 0.05 * flicker }, // Sickly green perimeter
-      { halfAngle: 0.55, lenFactor: 0.95, color: '234, 179, 8',  alpha: 0.10 * flicker }, // Honey amber mid-beam
-      { halfAngle: 0.36, lenFactor: 1.00, color: '254, 240, 138', alpha: 0.18 * flicker }, // Warm yellow illumination
-      { halfAngle: 0.18, lenFactor: 1.03, color: '254, 249, 195', alpha: 0.28 * flicker }  // Bright core searchlight beam
-    ];
-
-    for (const pass of bloomPasses) {
-      const pLen = beamLength * pass.lenFactor;
-      const bGrad = ctx.createRadialGradient(0, 0, 8, 0, 0, pLen);
-      bGrad.addColorStop(0, `rgba(${pass.color}, ${pass.alpha * 1.2})`);
-      bGrad.addColorStop(0.20, `rgba(${pass.color}, ${pass.alpha * 0.95})`);
-      bGrad.addColorStop(0.55, `rgba(${pass.color}, ${pass.alpha * 0.50})`);
-      bGrad.addColorStop(0.85, `rgba(${pass.color}, ${pass.alpha * 0.15})`);
-      bGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-      ctx.fillStyle = bGrad;
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.arc(0, 0, pLen, -pass.halfAngle, pass.halfAngle);
-      ctx.closePath();
-      ctx.fill();
-    }
-    ctx.restore();
-
-    // World Lanterns Colored Halos
-    for (const lantern of this.map.worldLanterns) {
-      const lScreen = this.camera.worldToScreen(new Vector2(lantern.x, lantern.y));
-      if (
-        lScreen.x >= -lantern.radius &&
-        lScreen.x <= width + lantern.radius &&
-        lScreen.y >= -lantern.radius &&
-        lScreen.y <= height + lantern.radius
-      ) {
-        const lBloom = ctx.createRadialGradient(
-          lScreen.x, lScreen.y, 4,
-          lScreen.x, lScreen.y, lantern.radius * 0.85
-        );
-        lBloom.addColorStop(0, `${lantern.color}50`);
-        lBloom.addColorStop(0.35, `${lantern.color}22`);
-        lBloom.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        ctx.fillStyle = lBloom;
-        ctx.beginPath();
-        ctx.arc(lScreen.x, lScreen.y, lantern.radius * 0.85, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-    ctx.restore();
-
-    // 4. Volumetric Rolling Fog (3 Parallax Layers of Low-Opacity Grey-Green Patches)
-    ctx.save();
-    const cam = this.camera.position;
-    const fogLayers = [
-      { count: 7, speed: 7, parallax: 0.08, rx: 280, ry: 140, alpha: 0.07, color: '18, 34, 30' },
-      { count: 9, speed: 17, parallax: 0.16, rx: 200, ry: 105, alpha: 0.09, color: '24, 44, 38' },
-      { count: 11, speed: 27, parallax: 0.24, rx: 140, ry: 75, alpha: 0.08, color: '32, 56, 48' }
-    ];
-
-    for (const layer of fogLayers) {
-      const wrapW = width + layer.rx * 2;
-      const wrapH = height + layer.ry * 2;
-
-      for (let i = 0; i < layer.count; i++) {
-        const seedX = i * 389.7 + i * i * 47.1;
-        const seedY = i * 271.3 + i * 83.5;
-
-        const rawX = seedX + t * layer.speed - cam.x * layer.parallax;
-        const rawY = seedY + Math.sin(t * 0.28 + i * 1.6) * 35 - cam.y * layer.parallax;
-
-        const px = ((rawX % wrapW) + wrapW) % wrapW - layer.rx;
-        const py = ((rawY % wrapH) + wrapH) % wrapH - layer.ry;
-
-        const fGrad = ctx.createRadialGradient(px, py, 10, px, py, layer.rx);
-        fGrad.addColorStop(0, `rgba(${layer.color}, ${layer.alpha})`);
-        fGrad.addColorStop(0.55, `rgba(${layer.color}, ${layer.alpha * 0.5})`);
-        fGrad.addColorStop(1, `rgba(${layer.color}, 0)`);
-
-        ctx.save();
-        ctx.translate(px, py);
-        ctx.scale(1, layer.ry / layer.rx);
-        ctx.fillStyle = fGrad;
-        ctx.beginPath();
-        ctx.arc(0, 0, layer.rx, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-    }
-    ctx.restore();
-
-    // 5. Heavy Claustrophobic Screen-Edge Vignette
-    ctx.save();
-    const minDim = Math.min(width, height);
-    const maxDim = Math.max(width, height);
-    const vig = ctx.createRadialGradient(width / 2, height / 2, minDim * 0.30, width / 2, height / 2, maxDim * 0.74);
-    vig.addColorStop(0, 'rgba(0, 0, 0, 0)');
-    vig.addColorStop(0.5, 'rgba(2, 6, 12, 0.40)');
-    vig.addColorStop(0.85, 'rgba(1, 3, 8, 0.82)');
-    vig.addColorStop(1, 'rgba(0, 2, 5, 0.96)');
-    ctx.fillStyle = vig;
-    ctx.fillRect(0, 0, width, height);
-
-    // 6. Particle System: Drifting Bioluminescent Spores
-    ctx.save();
-    for (const spore of this.spores) {
-      const lifeRatio = spore.life / spore.maxLife;
-      const alpha = Math.sin(lifeRatio * Math.PI) * 0.85;
-      if (alpha <= 0.01) continue;
-
-      ctx.save();
-      ctx.shadowBlur = 6;
-      ctx.shadowColor = spore.color;
-      ctx.fillStyle = spore.color;
-      ctx.globalAlpha = alpha;
-      ctx.beginPath();
-      ctx.arc(spore.x, spore.y, spore.radius, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-    ctx.restore();
-
-    // 7. Subtle Eldritch Film Grain / Miasma Dust
-    ctx.fillStyle = 'rgba(167, 243, 208, 0.028)';
-    for (let i = 0; i < 35; i++) {
-      const gx = (i * 97.7 + t * 45) % width;
-      const gy = (i * 53.3 - t * 30 + (i % 2 === 0 ? 0 : height)) % height;
-      ctx.fillRect(gx, gy, 1.5, 1.5);
-    }
-    ctx.restore();
   }
 }
 

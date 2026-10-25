@@ -3,6 +3,8 @@ import { FishingSpot } from './FishingSpot';
 import type { WaterZoneType } from './FishingSpot';
 import { HarborDock } from './HarborDock';
 import { AudioManager } from '../../engine/AudioManager';
+import { AtmosphereManager } from './AtmosphereManager';
+import { WhirlpoolSpawner } from './WhirlpoolSpawner';
 
 export interface IslandCollider {
   x: number;
@@ -45,11 +47,21 @@ interface SubmergedTentacle {
   baseAngle: number;
 }
 
+interface DriftParticle {
+  x: number;
+  y: number;
+  radius: number;
+  alpha: number;
+  speed: number;
+  seed: number;
+}
+
 export class OverworldMap {
-  public readonly width: number = 2400;
-  public readonly height: number = 1800;
+  public readonly width: number = 8000;
+  public readonly height: number = 8000;
 
   public harborDock: HarborDock;
+  public whirlpoolSpawner!: WhirlpoolSpawner;
   public fishingSpots: FishingSpot[] = [];
   public islandColliders: IslandCollider[] = [];
 
@@ -59,19 +71,31 @@ export class OverworldMap {
   // Submerged deep-water horror silhouettes (tentacles writhing in the abyss)
   private submergedTentacles: SubmergedTentacle[] = [];
 
+  // Camera-anchored toroidal drift particles
+  private driftParticles: DriftParticle[] = [];
+
   // World lanterns that cast dynamic light pools into the darkness
   public readonly worldLanterns: WorldLantern[] = [
-    { x: 356, y: 1450, radius: 180, color: '#fef08a' }, // Harbor Dock Gas Lantern
-    { x: 1060, y: 930, radius: 170, color: '#6ee7b7' }, // Central Pine Island Shrine Lantern
-    { x: 1940, y: 640, radius: 160, color: '#38bdf8' }, // East Rocky Spire Beacon
-    { x: 480, y: 1540, radius: 150, color: '#f59e0b' }  // Quayside Shore Outpost Lantern
+    { x: 4000, y: 4070, radius: 240, color: '#fef08a' }, // Central Safe Harbor Gas Lantern
+    { x: 3200, y: 3100, radius: 180, color: '#6ee7b7' }, // Pine Island Shrine Lantern
+    { x: 5500, y: 2800, radius: 200, color: '#38bdf8' }, // East Rocky Spire Beacon
+    { x: 4000, y: 4220, radius: 160, color: '#f59e0b' }  // Harbor South Watchtower Lantern
   ];
 
   private time: number = 0;
+  private atmosphereManager?: AtmosphereManager;
+
+  public setAtmosphereManager(atmo: AtmosphereManager): void {
+    this.atmosphereManager = atmo;
+  }
+
+  public getAtmosphereManager(): AtmosphereManager | undefined {
+    return this.atmosphereManager;
+  }
 
   constructor() {
-    // 1. Setup Harbor Dock at a sheltered bay in the south-west
-    this.harborDock = new HarborDock(400, 1450);
+    // 1. Setup Central Safe Harbor Dock at (4000, 4070)
+    this.harborDock = new HarborDock(4000, 4070);
 
     // 2. Setup Islands and Shoreline Colliders
     this.setupColliders();
@@ -82,35 +106,54 @@ export class OverworldMap {
     // 4. Setup deep-water submerged tentacle silhouettes
     this.setupSubmergedTentacles();
 
-    // 5. Setup Fishing Spots across the 3 distinct depth zones
+    // 5. Setup Fishing Spots across the 4 concentric depth zones
     this.setupFishingSpots();
+
+    // 6. Initialize camera-anchored toroidal drift particles
+    this.initDriftParticles();
+  }
+
+  private initDriftParticles(): void {
+    this.driftParticles = [];
+    for (let i = 0; i < 160; i++) {
+      this.driftParticles.push({
+        x: 4000 + (Math.random() - 0.5) * 2600,
+        y: 4000 + (Math.random() - 0.5) * 2200,
+        radius: 1.0 + Math.random() * 2.0,
+        alpha: 0.20 + Math.random() * 0.45,
+        speed: 5 + Math.random() * 8,
+        seed: Math.random() * 100
+      });
+    }
   }
 
   private setupColliders(): void {
     // Colliders keep physics smooth while matching the organic jagged visual footprints
     this.islandColliders = [
-      // Harbor mainland peninsula coast colliders
-      { x: 200, y: 1550, radius: 160, type: 'island' },
-      { x: 400, y: 1620, radius: 140, type: 'island' },
-      { x: 600, y: 1560, radius: 150, type: 'island' },
+      // Central Safe Harbor sheltered cove & breakwater
+      { x: 4000, y: 4220, radius: 130, type: 'island' },
+      { x: 3870, y: 4140, radius: 80, type: 'rock' },
+      { x: 4130, y: 4140, radius: 80, type: 'rock' },
 
-      // Central Pine Island
-      { x: 1050, y: 950, radius: 120, type: 'island' },
-      { x: 1180, y: 920, radius: 95, type: 'island' },
-      { x: 1130, y: 1040, radius: 85, type: 'island' },
+      // Zone 1 & 2 Archipelago Islets (The Shallows & Foggy Banks)
+      { x: 3200, y: 3100, radius: 120, type: 'island' },
+      { x: 3330, y: 3020, radius: 90, type: 'island' },
+      { x: 4800, y: 3400, radius: 95, type: 'sandbar' },
+      { x: 4950, y: 3500, radius: 75, type: 'sandbar' },
+      { x: 3100, y: 4900, radius: 80, type: 'sandbar' },
 
-      // North-West Reed Sandbar islets
-      { x: 450, y: 450, radius: 75, type: 'sandbar' },
-      { x: 620, y: 350, radius: 60, type: 'sandbar' },
-      { x: 300, y: 580, radius: 80, type: 'sandbar' },
+      // Zone 3 Sunken Reefs (Rocky Crags & Spires)
+      { x: 5500, y: 2800, radius: 100, type: 'rock' },
+      { x: 5650, y: 2920, radius: 80, type: 'rock' },
+      { x: 2300, y: 5200, radius: 95, type: 'rock' },
+      { x: 2450, y: 5350, radius: 85, type: 'rock' },
+      { x: 2100, y: 2400, radius: 90, type: 'rock' },
 
-      // East Rocky Spire
-      { x: 1950, y: 650, radius: 90, type: 'rock' },
-      { x: 2050, y: 720, radius: 70, type: 'rock' },
-
-      // Trench Barrier Reef (South-East)
-      { x: 1600, y: 1350, radius: 80, type: 'rock' },
-      { x: 1720, y: 1460, radius: 75, type: 'rock' }
+      // Zone 4 Eldritch Monoliths (Abyssal Void Outcrops)
+      { x: 1400, y: 1600, radius: 110, type: 'rock' },
+      { x: 6700, y: 6500, radius: 120, type: 'rock' },
+      { x: 1600, y: 6600, radius: 100, type: 'rock' },
+      { x: 6600, y: 1500, radius: 105, type: 'rock' }
     ];
   }
 
@@ -227,91 +270,45 @@ export class OverworldMap {
 
   private setupSubmergedTentacles(): void {
     this.submergedTentacles = [
-      { baseX: 1800, baseY: 1250, length: 140, phaseOffset: 0, baseAngle: -0.4 },
-      { baseX: 1980, baseY: 1520, length: 160, phaseOffset: 2.1, baseAngle: 0.6 },
-      { baseX: 1480, baseY: 920, length: 120, phaseOffset: 4.3, baseAngle: -1.2 },
-      { baseX: 1650, baseY: 1400, length: 135, phaseOffset: 1.4, baseAngle: 1.8 }
+      { baseX: 2300, baseY: 5200, length: 150, phaseOffset: 0, baseAngle: -0.4 },
+      { baseX: 5500, baseY: 2800, length: 160, phaseOffset: 2.1, baseAngle: 0.6 },
+      { baseX: 1400, baseY: 1600, length: 170, phaseOffset: 4.3, baseAngle: -1.2 },
+      { baseX: 6700, baseY: 6500, length: 180, phaseOffset: 1.4, baseAngle: 1.8 }
     ];
   }
 
   private setupFishingSpots(): void {
-    // Spot 1: Innsmouth Shoals (North-West)
-    this.fishingSpots.push(
-      new FishingSpot({
-        id: 'spot_shallow_1',
-        name: 'Innsmouth Shoals (Shallow Shoals)',
-        position: new Vector2(520, 520),
-        zoneType: 'shallow',
-        speciesType: 'perch',
-        description: 'Murky brackish shallows choked with rotting eel-grass. Uncanny Innsmouth Perch lurk in the gloom.'
-      })
-    );
-
-    // Spot 2: The Drowned Sound (Central / North-East)
-    this.fishingSpots.push(
-      new FishingSpot({
-        id: 'spot_lake_1',
-        name: 'The Drowned Sound (Foggy Waters)',
-        position: new Vector2(1450, 780),
-        zoneType: 'lake',
-        speciesType: 'pike',
-        description: 'Cold slate-grey waters shrouded in maritime mist. The vicious Blighted Pike patrols near sunken timbers.'
-      })
-    );
-
-    // Spot 3: Devil’s Reef Chasm (South-East)
-    this.fishingSpots.push(
-      new FishingSpot({
-        id: 'spot_abyss_1',
-        name: 'Devil’s Reef Chasm (Sunken Abyss)',
-        position: new Vector2(1950, 1400),
-        zoneType: 'abyss',
-        speciesType: 'gar',
-        description: 'A lightless abyss descending into sunken cyclopean ruins. The titanic Abyssal Void-Gar stirs below.'
-      })
-    );
-
-    // Spot 4: The Sunken Ruin of Dagon (Boss Chasm)
-    this.fishingSpots.push(
-      new FishingSpot({
-        id: 'spot_abyss_2',
-        name: 'The Sunken Ruin of Dagon (Boss Chasm)',
-        position: new Vector2(2150, 850),
-        zoneType: 'cave',
-        speciesType: 'dagon',
-        description: 'Cyclopean basalt ruins submerged in pitch black brine. The primordial monstrosity Apex Dagon slumbers here.'
-      })
-    );
+    // Dynamic Whirlpool Spawner: maintains 6-8 global spots with 2-3 local bias
+    this.whirlpoolSpawner = new WhirlpoolSpawner(this.islandColliders, new Vector2(4000, 4000));
+    this.fishingSpots = this.whirlpoolSpawner.getActiveWhirlpools();
   }
 
   public getZoneAt(pos: Vector2): WaterZoneType {
-    if (pos.x < 900 && pos.y < 900) {
-      return 'shallow';
-    } else if (pos.x > 1450 && pos.y > 1050) {
-      return 'abyss';
-    }
-    return 'lake';
+    return AtmosphereManager.getZoneAt(pos);
   }
 
   public getZoneDisplayName(zone: WaterZoneType): string {
-    switch (zone) {
-      case 'shallow': return 'Innsmouth Shoals (Tier 1)';
-      case 'lake': return 'The Drowned Sound (Tier 2)';
-      case 'abyss': return 'Devil’s Reef Chasm (Tier 3)';
-      case 'cave': return 'The Sunken Ruin of Dagon (Tier 4)';
-    }
+    return AtmosphereManager.getZoneDisplayName(zone);
   }
 
-  public update(dt: number, boatPos: Vector2): void {
+  public update(dt: number, boatPos: Vector2, isFishing: boolean = false): void {
     this.time += dt;
 
     // Update dock
     this.harborDock.update(dt, boatPos);
 
-    // Update fishing spots
-    for (const spot of this.fishingSpots) {
-      spot.update(dt, boatPos);
-    }
+    // Update dynamic whirlpool spawner and synchronize active spots
+    this.whirlpoolSpawner.update(dt, boatPos, isFishing);
+    this.fishingSpots = this.whirlpoolSpawner.getActiveWhirlpools();
+  }
+
+  public getNearbyFishingSpot(boatPos: Vector2): FishingSpot | null {
+    return this.whirlpoolSpawner.getNearbySpot(boatPos);
+  }
+
+  public onFishingVictory(spotId: string): void {
+    this.whirlpoolSpawner.onFishingVictory(spotId);
+    this.fishingSpots = this.whirlpoolSpawner.getActiveWhirlpools();
   }
 
   /**
@@ -356,103 +353,302 @@ export class OverworldMap {
     }
   }
 
-  public render(ctx: CanvasRenderingContext2D, _cameraPos: Vector2, _viewWidth: number, _viewHeight: number): void {
-    // 1. Base Abyssal Water, Depth Zones & Caustic Drift
-    this.renderWaterZones(ctx);
+  public render(ctx: CanvasRenderingContext2D, cameraPos: Vector2, viewWidth: number, viewHeight: number): void {
+    // 1. Calculate camera visible AABB with 200px margin for culling
+    const margin = 200;
+    const halfW = viewWidth / 2 + margin;
+    const halfH = viewHeight / 2 + margin;
+    const minX = Math.max(0, cameraPos.x - halfW);
+    const maxX = Math.min(this.width, cameraPos.x + halfW);
+    const minY = Math.max(0, cameraPos.y - halfH);
+    const maxY = Math.min(this.height, cameraPos.y + halfH);
 
-    // 2. Submerged Horrors (Writhing Tentacles & Bioluminescent Kelp Beds)
-    this.renderSubmergedHorrors(ctx);
+    // 2. Update camera-anchored toroidal drift particles
+    this.updateDriftParticles(0.016, cameraPos, viewWidth, viewHeight);
 
-    // 3. Procedural Jagged Organic Shorelines & Landmasses
-    this.renderOrganicIslands(ctx);
+    // 3. Base Abyssal Water, Depth Zones, Bathymetry & Wave Crest Ribbons
+    this.renderWaterZones(ctx, cameraPos, minX, maxX, minY, maxY, viewWidth, viewHeight);
 
-    // 4. Harbor Dock
-    this.harborDock.render(ctx);
+    // 4. Camera-Anchored Toroidal Drift Particles (Velocity cues in open water)
+    this.renderDriftParticles(ctx, minX, maxX, minY, maxY);
 
-    // 5. Interactive Fishing Spots (Swirling Eldritch Vortexes)
+    // 5. Submerged Horrors (Writhing Tentacles & Bioluminescent Kelp Beds) with Viewport Culling
+    this.renderSubmergedHorrors(ctx, minX, maxX, minY, maxY);
+
+    // 6. Procedural Jagged Organic Shorelines & Landmasses with Viewport Culling
+    this.renderOrganicIslands(ctx, minX, maxX, minY, maxY);
+
+    // 7. Harbor Dock with Viewport Culling
+    if (
+      this.harborDock.position.x + 120 >= minX &&
+      this.harborDock.position.x - 120 <= maxX &&
+      this.harborDock.position.y + 120 >= minY &&
+      this.harborDock.position.y - 120 <= maxY
+    ) {
+      this.harborDock.render(ctx);
+    }
+
+    // 8. Interactive Fishing Spots with Viewport Culling
     for (const spot of this.fishingSpots) {
-      spot.render(ctx);
+      if (
+        spot.position.x + 140 >= minX &&
+        spot.position.x - 140 <= maxX &&
+        spot.position.y + 140 >= minY &&
+        spot.position.y - 140 <= maxY
+      ) {
+        spot.render(ctx);
+      }
     }
   }
 
-  private renderWaterZones(ctx: CanvasRenderingContext2D): void {
-    // 1. Base Midnight-Abyss Navy (#040914)
-    ctx.fillStyle = '#040914';
-    ctx.fillRect(0, 0, this.width, this.height);
+  private updateDriftParticles(dt: number, cameraPos: Vector2, viewWidth: number, viewHeight: number): void {
+    const wrapW = viewWidth + 300;
+    const wrapH = viewHeight + 300;
 
-    // 2. Innsmouth Shoals (North-West) - Shallow turquoise-scum edges fading into dark water
-    const shallowGrad = ctx.createRadialGradient(260, 260, 60, 520, 520, 850);
-    shallowGrad.addColorStop(0, '#0e2b24'); // Shallow murky turquoise scum
-    shallowGrad.addColorStop(0.45, '#091c18');
-    shallowGrad.addColorStop(0.85, '#061313');
-    shallowGrad.addColorStop(1, 'rgba(4, 9, 20, 0)');
-    ctx.fillStyle = shallowGrad;
-    ctx.fillRect(0, 0, 1150, 1150);
+    for (const p of this.driftParticles) {
+      // Ambient slow oceanic drift
+      p.x += Math.cos(p.seed + this.time * 0.12) * p.speed * dt;
+      p.y += (Math.sin(p.seed + this.time * 0.12) * 2 - 5) * dt;
 
-    // 3. Devil's Reef Chasm (South-East) - Pitch-black abyssal core (#010307)
-    const abyssGrad = ctx.createRadialGradient(1950, 1450, 60, 1950, 1450, 820);
-    abyssGrad.addColorStop(0, '#010307'); // Lightless void core
-    abyssGrad.addColorStop(0.5, '#020610');
-    abyssGrad.addColorStop(0.85, '#040a17');
-    abyssGrad.addColorStop(1, 'rgba(4, 9, 20, 0)');
-    ctx.fillStyle = abyssGrad;
-    ctx.fillRect(1150, 800, 1250, 1000);
+      // Toroidal wrap around camera position
+      const dx = p.x - cameraPos.x;
+      if (dx < -wrapW / 2) {
+        p.x += wrapW;
+      } else if (dx > wrapW / 2) {
+        p.x -= wrapW;
+      }
 
-    // 4. Trench Bathymetry Contour Lines with Eldritch dashed runes
+      const dy = p.y - cameraPos.y;
+      if (dy < -wrapH / 2) {
+        p.y += wrapH;
+      } else if (dy > wrapH / 2) {
+        p.y -= wrapH;
+      }
+    }
+  }
+
+  private renderDriftParticles(
+    ctx: CanvasRenderingContext2D,
+    minX: number,
+    maxX: number,
+    minY: number,
+    maxY: number
+  ): void {
     ctx.save();
-    ctx.strokeStyle = 'rgba(45, 212, 191, 0.15)'; // Eerie cyan-green bathymetry
-    ctx.lineWidth = 1.6;
-    ctx.setLineDash([16, 14]);
-    ctx.beginPath();
-    ctx.ellipse(1950, 1420, 440, 310, 0.18, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.ellipse(1950, 1420, 290, 200, 0.18, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.ellipse(1950, 1420, 155, 110, 0.18, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.restore();
+    for (const p of this.driftParticles) {
+      if (p.x >= minX && p.x <= maxX && p.y >= minY && p.y <= maxY) {
+        ctx.fillStyle = `rgba(186, 230, 253, ${p.alpha})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
 
-    // 5. Animated Caustic Drift (Subtle, winding wave highlight lines with alpha 0.15–0.25)
+        // Directional motion tail for larger particles
+        if (p.radius > 1.8) {
+          ctx.strokeStyle = `rgba(147, 197, 253, ${p.alpha * 0.45})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p.x - 4, p.y + 2);
+          ctx.stroke();
+        }
+      }
+    }
+    ctx.restore();
+  }
+
+  private renderWaterZones(
+    ctx: CanvasRenderingContext2D,
+    cameraPos: Vector2,
+    minX: number,
+    maxX: number,
+    minY: number,
+    maxY: number,
+    viewWidth: number,
+    viewHeight: number
+  ): void {
+    // 1. Base Dynamic Water Fill across visible viewport rect derived from AtmosphereManager
+    const camDist = Math.hypot(cameraPos.x - 4000, cameraPos.y - 4000);
+    const atmoParams = this.atmosphereManager
+      ? this.atmosphereManager.calculateAtmosphere(camDist)
+      : AtmosphereManager.calculateAtmosphere(camDist);
+
+    ctx.fillStyle = atmoParams.waterColor;
+    ctx.fillRect(minX, minY, maxX - minX, maxY - minY);
+
+    // 2. Concentric Radial Shallows to Abyss Gradient centered at Harbor (4000, 4000)
+    const harborGrad = ctx.createRadialGradient(4000, 4000, 100, 4000, 4000, 4800);
+    harborGrad.addColorStop(0, 'rgb(14, 52, 38)');     // Zone 1: Harbor Shallows (murky green)
+    harborGrad.addColorStop(0.25, 'rgb(11, 40, 36)');  // Zone 1 Outer
+    harborGrad.addColorStop(0.50, 'rgb(7, 25, 32)');   // Zone 2: Foggy Banks (dark teal)
+    harborGrad.addColorStop(0.75, 'rgb(4, 9, 18)');    // Zone 3: Sunken Reefs (abyssal slate)
+    harborGrad.addColorStop(1.0, 'rgb(1, 2, 4)');      // Zone 4: Eldritch Trench (pitch-black void)
+    ctx.fillStyle = harborGrad;
+    ctx.fillRect(minX, minY, maxX - minX, maxY - minY);
+
+    // 3. Concentric Bathymetric Depth Contour Lines with Nautical Depth Markings
+    this.renderBathymetryContours(ctx, cameraPos, minX, maxX, minY, maxY, viewWidth, viewHeight);
+
+    // 4. Animated Sinusoidal Wave Crest Ribbons with Foam Caps
+    this.renderWaveCrestRibbons(ctx, minX, maxX, minY, maxY);
+  }
+
+  private renderBathymetryContours(
+    ctx: CanvasRenderingContext2D,
+    cameraPos: Vector2,
+    minX: number,
+    maxX: number,
+    minY: number,
+    maxY: number,
+    viewWidth: number,
+    viewHeight: number
+  ): void {
+    const depthRings = [
+      { radius: 600,  depth: '10m',  color: 'rgba(52, 211, 153, 0.22)', dash: [16, 14] },
+      { radius: 1200, depth: '30m',  color: 'rgba(45, 212, 191, 0.25)', dash: [20, 12] },
+      { radius: 1800, depth: '45m',  color: 'rgba(45, 212, 191, 0.18)', dash: [16, 14] },
+      { radius: 2400, depth: '60m',  color: 'rgba(56, 189, 248, 0.22)', dash: [20, 12] },
+      { radius: 3000, depth: '80m',  color: 'rgba(56, 189, 248, 0.16)', dash: [16, 14] },
+      { radius: 3600, depth: '100m', color: 'rgba(129, 140, 248, 0.22)', dash: [24, 12] },
+      { radius: 4200, depth: '150m', color: 'rgba(167, 139, 250, 0.18)', dash: [18, 14] },
+      { radius: 4800, depth: '250m', color: 'rgba(192, 132, 252, 0.16)', dash: [24, 16] }
+    ];
+
+    const camDist = Math.hypot(cameraPos.x - 4000, cameraPos.y - 4000);
+    const maxViewDist = Math.hypot(viewWidth / 2, viewHeight / 2) + 200;
+
+    ctx.save();
+    ctx.lineWidth = 1.6;
+
+    for (const ring of depthRings) {
+      // Viewport culling for concentric circles
+      if (Math.abs(ring.radius - camDist) > maxViewDist) {
+        continue;
+      }
+
+      // Draw dashed bathymetric isoline
+      ctx.strokeStyle = ring.color;
+      ctx.setLineDash(ring.dash);
+      ctx.beginPath();
+      ctx.arc(4000, 4000, ring.radius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Render nautical depth markings at 8 compass bearings
+      ctx.setLineDash([]);
+      ctx.fillStyle = ring.color;
+      ctx.font = 'bold 11px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      for (let i = 0; i < 8; i++) {
+        const theta = (i * Math.PI) / 4;
+        const lx = 4000 + Math.cos(theta) * ring.radius;
+        const ly = 4000 + Math.sin(theta) * ring.radius;
+
+        if (lx >= minX && lx <= maxX && ly >= minY && ly <= maxY) {
+          ctx.save();
+          ctx.translate(lx, ly);
+          ctx.rotate(theta + Math.PI / 2);
+          ctx.fillText(`— ${ring.depth} —`, 0, 0);
+          ctx.restore();
+        }
+      }
+    }
+
+    ctx.restore();
+  }
+
+  private renderWaveCrestRibbons(
+    ctx: CanvasRenderingContext2D,
+    minX: number,
+    maxX: number,
+    minY: number,
+    maxY: number
+  ): void {
     ctx.save();
     const t = this.time;
-    for (let c = 0; c < 5; c++) {
-      const cAlpha = 0.14 + 0.08 * Math.sin(t * 0.8 + c * 1.5);
-      ctx.strokeStyle = c % 2 === 0
+    const waveSpacing = 160;
+
+    const startY = Math.floor(minY / waveSpacing) * waveSpacing - waveSpacing;
+    const endY = Math.ceil(maxY / waveSpacing) * waveSpacing + waveSpacing;
+
+    for (let wy = startY; wy <= endY; wy += waveSpacing) {
+      const waveIdx = Math.round(wy / waveSpacing);
+      const driftY = wy + ((t * 18 + waveIdx * 43) % waveSpacing);
+
+      if (driftY < minY - 30 || driftY > maxY + 30) continue;
+
+      const cAlpha = 0.12 + 0.06 * Math.sin(t * 0.9 + waveIdx * 1.3);
+      ctx.strokeStyle = waveIdx % 2 === 0
         ? `rgba(94, 234, 212, ${cAlpha})`
         : `rgba(148, 163, 184, ${cAlpha * 0.85})`;
       ctx.lineWidth = 1.6;
 
-      const driftY = ((c * 340 + t * 14) % (this.height + 200)) - 100;
       ctx.beginPath();
-      for (let x = 0; x <= this.width; x += 60) {
+      let firstPoint = true;
+
+      for (let x = minX; x <= maxX; x += 40) {
         const wave =
-          Math.sin(x * 0.008 + t * 0.6 + c) * 22 +
-          Math.cos(x * 0.018 - t * 0.4 + c * 2) * 12;
+          Math.sin(x * 0.007 + t * 0.8 + waveIdx * 1.5) * 16 +
+          Math.cos(x * 0.016 - t * 0.5 + waveIdx) * 8;
         const y = driftY + wave;
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+
+        if (firstPoint) {
+          ctx.moveTo(x, y);
+          firstPoint = false;
+        } else {
+          ctx.lineTo(x, y);
+        }
       }
       ctx.stroke();
+
+      // Render foam caps at sinusoidal wave peaks
+      for (let x = minX + 20; x <= maxX - 20; x += 90) {
+        const peakPhase = Math.sin(x * 0.007 + t * 0.8 + waveIdx * 1.5);
+        if (peakPhase > 0.65) {
+          const wave =
+            peakPhase * 16 +
+            Math.cos(x * 0.016 - t * 0.5 + waveIdx) * 8;
+          const y = driftY + wave;
+          const foamAlpha = ((peakPhase - 0.65) / 0.35) * 0.38;
+
+          ctx.fillStyle = `rgba(204, 251, 241, ${foamAlpha})`;
+          ctx.beginPath();
+          ctx.ellipse(x, y - 1, 10, 2.4, 0.06, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = `rgba(255, 255, 255, ${foamAlpha * 0.8})`;
+          ctx.beginPath();
+          ctx.ellipse(x, y - 1, 5, 1.2, 0.06, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
     }
+
     ctx.restore();
   }
 
-  private renderSubmergedHorrors(ctx: CanvasRenderingContext2D): void {
+  private renderSubmergedHorrors(
+    ctx: CanvasRenderingContext2D,
+    minX: number,
+    maxX: number,
+    minY: number,
+    maxY: number
+  ): void {
     ctx.save();
 
     // 1. Glowing Bioluminescent Kelp Patches beneath the water
     const kelpClusters = [
-      { x: 420, y: 720, r: 65, color: '#10b981' },
-      { x: 780, y: 480, r: 55, color: '#2dd4bf' },
-      { x: 1350, y: 580, r: 70, color: '#10b981' },
-      { x: 1720, y: 1050, r: 80, color: '#38bdf8' },
-      { x: 1480, y: 1250, r: 60, color: '#2dd4bf' }
+      { x: 3800, y: 3700, r: 65, color: '#10b981' },
+      { x: 4250, y: 3600, r: 55, color: '#2dd4bf' },
+      { x: 3400, y: 3200, r: 70, color: '#10b981' },
+      { x: 4700, y: 4400, r: 80, color: '#38bdf8' },
+      { x: 3600, y: 4500, r: 60, color: '#2dd4bf' }
     ];
 
     for (const kc of kelpClusters) {
+      if (kc.x + kc.r < minX || kc.x - kc.r > maxX || kc.y + kc.r < minY || kc.y - kc.r > maxY) {
+        continue;
+      }
       const pulse = 0.5 + 0.5 * Math.sin(this.time * 1.8 + kc.x * 0.01);
       const kGrad = ctx.createRadialGradient(kc.x, kc.y, 4, kc.x, kc.y, kc.r);
       kGrad.addColorStop(0, `rgba(45, 212, 191, ${0.22 + pulse * 0.15})`);
@@ -478,6 +674,14 @@ export class OverworldMap {
 
     // 2. Submerged Tentacle Silhouettes (Eldritch Horrors writhing in the abyss)
     for (const ten of this.submergedTentacles) {
+      if (
+        ten.baseX + ten.length * 1.5 < minX ||
+        ten.baseX - ten.length * 1.5 > maxX ||
+        ten.baseY + ten.length * 1.5 < minY ||
+        ten.baseY - ten.length * 1.5 > maxY
+      ) {
+        continue;
+      }
       const tProgress = this.time * 1.2 + ten.phaseOffset;
       const sway1 = Math.sin(tProgress) * 35;
       const sway2 = Math.cos(tProgress * 0.7) * 25;
@@ -521,20 +725,39 @@ export class OverworldMap {
     ctx.restore();
   }
 
-  private renderOrganicIslands(ctx: CanvasRenderingContext2D): void {
+  private renderOrganicIslands(
+    ctx: CanvasRenderingContext2D,
+    minX: number,
+    maxX: number,
+    minY: number,
+    maxY: number
+  ): void {
     // 1. Lake Outer Edge Shoreline Border (Craggy dark rock & decaying salt grass)
-    ctx.save();
-    ctx.strokeStyle = '#0b1210';
-    ctx.lineWidth = 34;
-    ctx.strokeRect(17, 17, this.width - 34, this.height - 34);
+    // Only rendered if visible viewport overlaps the outer boundary
+    if (minX <= 70 || maxX >= this.width - 70 || minY <= 70 || maxY >= this.height - 70) {
+      ctx.save();
+      ctx.strokeStyle = '#0b1210';
+      ctx.lineWidth = 34;
+      ctx.strokeRect(17, 17, this.width - 34, this.height - 34);
 
-    ctx.strokeStyle = '#1d2b24'; // Murky shoreline fringe
-    ctx.lineWidth = 14;
-    ctx.strokeRect(32, 32, this.width - 64, this.height - 64);
-    ctx.restore();
+      ctx.strokeStyle = '#1d2b24'; // Murky shoreline fringe
+      ctx.lineWidth = 14;
+      ctx.strokeRect(32, 32, this.width - 64, this.height - 64);
+      ctx.restore();
+    }
 
-    // 2. Procedural Jagged Multi-Band Islands & Coastlines
+    // 2. Procedural Jagged Multi-Band Islands & Coastlines with Viewport Culling
     for (const island of this.organicIslands) {
+      // Cull island if outside visible viewport + margin
+      if (
+        island.center.x + island.radius * 1.3 < minX ||
+        island.center.x - island.radius * 1.3 > maxX ||
+        island.center.y + island.radius * 1.3 < minY ||
+        island.center.y - island.radius * 1.3 > maxY
+      ) {
+        continue;
+      }
+
       ctx.save();
 
       // Band A: Outer Submerged Shelf (Deep murky algae wash)
@@ -691,14 +914,17 @@ export class OverworldMap {
       ctx.restore();
     }
 
-    // 3. Innsmouth Shoals Dead Reeds & Rotting Eel-Grass Beds (North-West)
+    // 3. Shallows Dead Reeds & Rotting Eel-Grass Beds
     ctx.save();
     const reedClusters = [
-      { x: 380, y: 390 }, { x: 420, y: 560 }, { x: 580, y: 410 },
-      { x: 680, y: 510 }, { x: 320, y: 480 }, { x: 490, y: 640 }
+      { x: 3600, y: 3800 }, { x: 3700, y: 3900 }, { x: 4200, y: 3800 },
+      { x: 4300, y: 3950 }, { x: 3800, y: 3600 }, { x: 4150, y: 3650 }
     ];
 
     for (const c of reedClusters) {
+      if (c.x < minX || c.x > maxX || c.y < minY || c.y > maxY) {
+        continue;
+      }
       const sway = Math.sin(this.time * 2.2 + c.x * 0.05) * 4.5;
       ctx.strokeStyle = '#2b3d28'; // Decaying swamp reed green
       ctx.lineWidth = 2.4;

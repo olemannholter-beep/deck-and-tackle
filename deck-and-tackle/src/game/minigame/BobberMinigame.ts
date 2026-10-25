@@ -302,33 +302,35 @@ export class BobberMinigame {
       ctx.stroke();
     }
 
-    // 3. Underwater Fish Shadow circling under target landing point
-    const shadowAnchorX = this.phase === 'power_charge' ? width * 0.60 : this.bobberPos.x;
-    const fishDistRatio = this.phase === 'casting' || this.phase === 'power_charge' ? 1.0 : Math.max(0, 1 - (this.nibbleCount / (this.targetNibbles + 1)));
-    const fishX = shadowAnchorX + Math.sin(this.time * 2) * (25 + fishDistRatio * 45);
-    const fishY = waterLevelY + 45 + Math.cos(this.time * 1.5) * 15;
+    // 3. Underwater Fish Shadow circling under target landing point (Zones 2-4 only; Shoals use animated minnows)
+    if (this.zoneType !== 'shallow') {
+      const shadowAnchorX = this.phase === 'power_charge' ? width * 0.60 : this.bobberPos.x;
+      const fishDistRatio = this.phase === 'casting' || this.phase === 'power_charge' ? 1.0 : Math.max(0, 1 - (this.nibbleCount / (this.targetNibbles + 1)));
+      const fishX = shadowAnchorX + Math.sin(this.time * 2) * (25 + fishDistRatio * 45);
+      const fishY = waterLevelY + 45 + Math.cos(this.time * 1.5) * 15;
 
-    const isMovingRight = Math.cos(this.time * 2) >= 0;
+      const isMovingRight = Math.cos(this.time * 2) >= 0;
 
-    ctx.save();
-    ctx.translate(fishX, fishY);
-    // Shadow is natively drawn with snout at +X (right) and tail at -X (left).
-    if (!isMovingRight) {
-      ctx.scale(-1, 1);
+      ctx.save();
+      ctx.translate(fishX, fishY);
+      // Shadow is natively drawn with snout at +X (right) and tail at -X (left).
+      if (!isMovingRight) {
+        ctx.scale(-1, 1);
+      }
+      ctx.rotate(Math.sin(this.time * 2) * 0.15);
+      ctx.fillStyle = 'rgba(10, 30, 45, 0.45)';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 24, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Tail
+      ctx.beginPath();
+      ctx.moveTo(-20, 0);
+      ctx.lineTo(-32, -6);
+      ctx.lineTo(-32, 6);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
     }
-    ctx.rotate(Math.sin(this.time * 2) * 0.15);
-    ctx.fillStyle = 'rgba(10, 30, 45, 0.45)';
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 24, 8, 0, 0, Math.PI * 2);
-    ctx.fill();
-    // Tail
-    ctx.beginPath();
-    ctx.moveTo(-20, 0);
-    ctx.lineTo(-32, -6);
-    ctx.lineTo(-32, 6);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
 
     // 4. Victorian Cork-and-Quill Bobber Float
     const bx = this.bobberPos.x;
